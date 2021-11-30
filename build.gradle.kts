@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.5.10"
+    id("org.openjfx.javafxplugin") version "0.0.10"
 }
 
 group = "com.dfsek"
@@ -19,4 +20,11 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
     implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("no.tornado:tornadofx:1.7.20")
+}
+
+javafx {
+    version = "17"
+    modules("javafx.controls", "javafx.fxml")
+    configuration = "implementation"
 }
