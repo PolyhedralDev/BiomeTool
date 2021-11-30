@@ -9,7 +9,7 @@ import tornadofx.*
 import kotlin.system.exitProcess
 
 
-class BiomeToolView : View() {
+class BiomeToolView : View("Biome Tool") {
     private val logger = LoggerFactory.getLogger(BiomeToolView::class.java)
     private val platform: Platform
     init {
@@ -31,7 +31,7 @@ class BiomeToolView : View() {
                     items = platform.configRegistry.keys().toList().toObservable()
                 }
                 button("Render").setOnAction {
-                    this@tabpane.tab("Render") {
+                    this@tabpane.tab("Render - ${select.selectedItem}") {
                         group {
                             imageview {
                                 fitToParentSize()
@@ -47,7 +47,6 @@ class BiomeToolView : View() {
                     }
                 }
             }
-
         }
     }
 }
