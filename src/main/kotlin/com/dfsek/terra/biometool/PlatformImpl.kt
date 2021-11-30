@@ -26,7 +26,8 @@ class PlatformImpl : AbstractPlatform() {
     }
 
     override fun reload(): Boolean {
-        return true
+        terraConfig.load(this)
+        return rawConfigRegistry.loadAll(this)
     }
 
     override fun platformName(): String {

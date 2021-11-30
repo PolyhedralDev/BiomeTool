@@ -47,6 +47,9 @@ class BiomeToolView : View("Biome Tool") {
                     }
                     this@tabpane.selectionModel.select(newTab)
                 }
+                button("Reload Packs").setOnAction {
+                    platform.reload()
+                }
             }
         }
     }
