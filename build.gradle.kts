@@ -31,6 +31,12 @@ dependencies {
     }
 }
 
+tasks.withType<Jar>().configureEach {
+    manifest {
+        attributes(mapOf("Main-Class" to "com.dfsek.terra.biometool.BiomeToolFXKt"))
+    }
+}
+
 javafx {
     version = "17"
     modules("javafx.controls", "javafx.fxml")
