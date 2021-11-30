@@ -8,19 +8,18 @@ import org.slf4j.LoggerFactory
 import tornadofx.*
 import kotlin.system.exitProcess
 
-private val LOGGER = LoggerFactory.getLogger(BiomeToolView::class.java)
 
 class BiomeToolView : View() {
+    private val logger = LoggerFactory.getLogger(BiomeToolView::class.java)
     private val platform: Platform
-
     init {
         primaryStage.setOnCloseRequest {
             exit()
             exitProcess(0)
         }
-        LOGGER.info("Initializing platform...")
+        logger.info("Initializing platform...")
         platform = PlatformImpl() // create and initialize platform
-        LOGGER.info("Platform initialized.")
+        logger.info("Platform initialized.")
     }
 
     override val root = tabpane {

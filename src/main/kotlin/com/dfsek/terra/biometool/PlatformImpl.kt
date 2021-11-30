@@ -15,14 +15,14 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.reflect.AnnotatedType
 
-private val LOGGER = LoggerFactory.getLogger(PlatformImpl::class.java)
-
 class PlatformImpl : AbstractPlatform() {
+    private val logger = LoggerFactory.getLogger(PlatformImpl::class.java)
+
     init {
-        LOGGER.info("Root directory: ${dataFolder.absoluteFile}")
+        logger.info("Root directory: ${dataFolder.absoluteFile}")
         load()
         eventManager.callEvent(PlatformInitializationEvent())
-        LOGGER.info("Enabled Terra platform.")
+        logger.info("Enabled Terra platform.")
     }
 
     override fun reload(): Boolean {
