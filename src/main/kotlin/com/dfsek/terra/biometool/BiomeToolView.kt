@@ -31,7 +31,7 @@ class BiomeToolView : View("Biome Tool") {
                     items = platform.configRegistry.keys().toList().toObservable()
                 }
                 button("Render").setOnAction {
-                    this@tabpane.tab("Render - ${select.selectedItem}") {
+                    val newTab = this@tabpane.tab("Render - ${select.selectedItem}") {
                         group {
                             imageview {
                                 fitToParentSize()
@@ -45,6 +45,7 @@ class BiomeToolView : View("Biome Tool") {
                             }
                         }
                     }
+                    this@tabpane.selectionModel.select(newTab)
                 }
             }
         }
