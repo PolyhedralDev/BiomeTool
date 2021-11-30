@@ -30,7 +30,6 @@ class BiomeCanvas(private val provider: BiomeProvider, private val img: Writable
         for(x in 0 until FastMath.floorDiv(width, chunkSize)+1) {
             for(z in 0 until FastMath.floorDiv(height, chunkSize)+1) {
                 executor.submit {
-                    logger.info("Rendering {$x,$z}")
                     try {
                         val originX = x * chunkSize
                         val originZ = z * chunkSize
