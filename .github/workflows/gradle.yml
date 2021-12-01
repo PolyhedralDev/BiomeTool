@@ -22,4 +22,4 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: BiomeTool-*-all.jar
+          files: build/libs/BiomeTool-*-all.jar
