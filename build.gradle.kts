@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version "1.6.0"
     id("org.openjfx.javafxplugin") version "0.0.10"
     id("com.github.johnrengelman.shadow") version "7.1.0"
 }
@@ -13,8 +13,9 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
 
     implementation("com.dfsek.terra:base:6.0.0-BETA+d0872f42")
 
