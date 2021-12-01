@@ -11,8 +11,7 @@ plugins {
 }
 
 var mainClassName: String by application.mainClass
-mainClassName = "ca.solostudios.biometool.LauncherKt"
-val javafxClassName = "ca.solostudios.biometool.BiomeTool"
+mainClassName = "com.dfsek.terra.biometool.BiomeToolFXKt"
 
 group = "com.dfsek"
 version = "0.2.3"
@@ -186,7 +185,7 @@ tasks.withType<Jar>() {
                 "Implementation-Title" to project.version,
                 "Implementation-Version" to archiveVersion.get(),
                 "JavaFX-Version" to javafx.version,
-                "JavaFX-Application-Class" to javafxClassName,
+                "JavaFX-Application-Class" to mainClassName,
                 "Name" to project.name,
                 "Add-Opens" to "javafx.graphics/javafx.scene",
                   )
