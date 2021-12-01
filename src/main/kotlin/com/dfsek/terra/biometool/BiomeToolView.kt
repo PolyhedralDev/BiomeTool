@@ -36,8 +36,12 @@ class BiomeToolView : View("Biome Tool") {
 
             val biome = Label()
             val select = combobox<String> {
-                items = platform.configRegistry.keys().toList().toObservable()
+                val configs = platform.configRegistry.keys().toList()
+                items = configs.toObservable()
+
+                selectionModel.selectFirst()
             }
+
             button("_Render").setOnAction {
                 val tempSeed = seed.text.toLong()
                 val newTab = tabPane.tab("${select.selectedItem}:$tempSeed") {
