@@ -11,7 +11,7 @@ plugins {
 }
 
 var mainClassName: String by application.mainClass
-mainClassName = "com.dfsek.terra.biometool.BiomeToolFXKt"
+mainClassName = "com.dfsek.terra.biometool.BiomeToolLauncherKt"
 
 group = "com.dfsek"
 version = "0.2.3"
