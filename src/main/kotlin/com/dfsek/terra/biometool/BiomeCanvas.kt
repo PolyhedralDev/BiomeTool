@@ -6,6 +6,7 @@ import javafx.scene.image.WritableImage
 import net.jafama.FastMath
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.kotlin.getLogger
 import java.awt.Canvas
 import java.awt.Color
 import java.awt.Graphics
@@ -14,7 +15,7 @@ import java.awt.event.ComponentListener
 import java.util.concurrent.Executors
 
 class BiomeCanvas(private val provider: BiomeProvider, private val img: WritableImage, private val seed: Long, var chunkSize: Int = 32) {
-    private val logger: Logger = LoggerFactory.getLogger(BiomeCanvas::class.java)
+    private val logger by getLogger()
 
     private var width = FastMath.ceilToInt(img.width)
     private var height = FastMath.ceilToInt(img.height)

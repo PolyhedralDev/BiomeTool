@@ -6,19 +6,30 @@ import javafx.scene.control.Label
 import javafx.scene.control.TabPane
 import javafx.scene.control.TextField
 import javafx.scene.image.WritableImage
-import javafx.scene.layout.VBox
 import net.jafama.FastMath
-import org.slf4j.LoggerFactory
-import tornadofx.*
+import org.slf4j.kotlin.getLogger
+import tornadofx.View
+import tornadofx.button
+import tornadofx.combobox
+import tornadofx.filterInput
+import tornadofx.hbox
+import tornadofx.imageview
+import tornadofx.isLong
+import tornadofx.label
+import tornadofx.selectedItem
+import tornadofx.tab
+import tornadofx.toObservable
+import tornadofx.vbox
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
 
 class BiomeToolView : View("Biome Tool") {
-    private val logger = LoggerFactory.getLogger(BiomeToolView::class.java)
+    private val logger by getLogger()
+    
     private val platform: Platform
-
+    
     init {
         primaryStage.setOnCloseRequest {
             exit()
@@ -28,20 +39,20 @@ class BiomeToolView : View("Biome Tool") {
         platform = PlatformImpl() // create and initialize platform
         logger.info("Platform initialized.")
     }
-
+    
     override val root = vbox {
         val tabPane = TabPane()
         hbox(5) {
             val seed = TextField()
-
+            
             val biome = Label()
             val select = combobox<String> {
                 val configs = platform.configRegistry.keys().toList()
                 items = configs.toObservable()
-
+                
                 selectionModel.selectFirst()
             }
-
+            
             button("_Render").setOnAction {
                 val tempSeed = seed.text.toLong()
                 val newTab = tabPane.tab("${select.selectedItem}:$tempSeed") {
@@ -60,16 +71,16 @@ class BiomeToolView : View("Biome Tool") {
             button("Reload _Packs").setOnAction {
                 platform.reload()
             }
-
+            
             seed.filterInput { it.controlNewText.isLong() }
             seed.text = "0"
             label("Seed")
             add(seed)
-
+            
             button("Random _Seed").setOnAction {
                 seed.text = ThreadLocalRandom.current().nextLong().toString()
             }
-
+            
             add(biome)
             maxHeight = 25.0
         }
