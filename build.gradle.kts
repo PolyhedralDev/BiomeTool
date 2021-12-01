@@ -75,9 +75,7 @@ dependencies {
     
     implementation("ca.solo-studios:slf4k:0.3.1")
     
-    implementation("org.apache.logging.log4j:log4j-api:2.14.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.14.1")
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
+    implementation("ch.qos.logback:logback-classic:1.2.7")
     
     implementation("com.google.guava:guava:31.0.1-jre")
     
@@ -156,23 +154,6 @@ val shadowJarOSX by tasks.creating(ShadowJar::class) {
 val shadowJarAll by tasks.creating(ShadowJar::class) {
     archiveClassifier.set("all")
     configurations = listOf(linuxImplementation, windowsImplementation, osxImplementation)
-}
-
-val disabledTasks = listOf(
-        "distZip",
-        "distTar",
-        "assembleDist",
-        "startScripts",
-        "installDist",
-        "shadowDistZip",
-        "shadowDistTar",
-        "startShadowScripts",
-        "assembleShadowDist",
-        "installShadowDist",
-                          )
-
-for (task in disabledTasks) {
-    tasks.getByName(task).enabled = false
 }
 
 tasks.withType<Jar>() {
