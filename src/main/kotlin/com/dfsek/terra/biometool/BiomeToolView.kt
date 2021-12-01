@@ -62,7 +62,7 @@ class BiomeToolView : View("Biome Tool") {
             label("Seed")
             add(seed)
 
-            button("Random Seed").setOnAction {
+            button("Random _Seed").setOnAction {
                 seed.text = ThreadLocalRandom.current().nextLong().toString()
             }
 
