@@ -15,8 +15,6 @@ import java.util.concurrent.Executors
 
 class BiomeCanvas(private val provider: BiomeProvider, private val img: WritableImage, private val seed: Long, var chunkSize: Int = 32) {
     private val logger: Logger = LoggerFactory.getLogger(BiomeCanvas::class.java)
-    var centerX = 0
-    var centerZ = 0
 
     private var width = FastMath.ceilToInt(img.width)
     private var height = FastMath.ceilToInt(img.height)
