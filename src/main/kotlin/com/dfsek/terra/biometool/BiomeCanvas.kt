@@ -13,7 +13,7 @@ import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
 import java.util.concurrent.Executors
 
-class BiomeCanvas(private val provider: BiomeProvider, private val img: WritableImage, var chunkSize: Int = 32) {
+class BiomeCanvas(private val provider: BiomeProvider, private val img: WritableImage, private val seed: Long, var chunkSize: Int = 32) {
     private val logger: Logger = LoggerFactory.getLogger(BiomeCanvas::class.java)
     var centerX = 0
     var centerZ = 0
@@ -36,7 +36,7 @@ class BiomeCanvas(private val provider: BiomeProvider, private val img: Writable
 
                         val data = Array(chunkSize) { xi ->
                             IntArray(chunkSize) { zi ->
-                                provider.getBiome(originX+xi, originZ+zi, 0).color
+                                provider.getBiome(originX+xi, originZ+zi, seed).color
                             }
                         }
 
