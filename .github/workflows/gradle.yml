@@ -1,6 +1,10 @@
 name: Java CI
 
-on: [push]
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
 
 jobs:
   build:
@@ -17,6 +21,5 @@ jobs:
         run: ./gradlew shadowJar
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: BiomeTool-*-all.jar
