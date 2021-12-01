@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox
 import net.jafama.FastMath
 import org.slf4j.LoggerFactory
 import tornadofx.*
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
@@ -61,7 +62,9 @@ class BiomeToolView : View("Biome Tool") {
             label("Seed")
             add(seed)
 
-
+            button("Random Seed").setOnAction {
+                seed.text = ThreadLocalRandom.current().nextLong().toString()
+            }
 
             add(biome)
             maxHeight = 25.0
