@@ -3,6 +3,7 @@ package com.dfsek.terra.biometool
 import com.dfsek.terra.api.Platform
 import javafx.application.Platform.exit
 import javafx.scene.image.WritableImage
+import javafx.scene.input.KeyEvent
 import net.jafama.FastMath
 import org.slf4j.LoggerFactory
 import tornadofx.*
@@ -30,7 +31,7 @@ class BiomeToolView : View("Biome Tool") {
                 val select = combobox<String> {
                     items = platform.configRegistry.keys().toList().toObservable()
                 }
-                button("Render").setOnAction {
+                button("_Render").setOnAction {
                     val newTab = this@tabpane.tab("Render - ${select.selectedItem}") {
                         group {
                             imageview {
@@ -47,7 +48,7 @@ class BiomeToolView : View("Biome Tool") {
                     }
                     this@tabpane.selectionModel.select(newTab)
                 }
-                button("Reload Packs").setOnAction {
+                button("Reload _Packs").setOnAction {
                     platform.reload()
                 }
             }
