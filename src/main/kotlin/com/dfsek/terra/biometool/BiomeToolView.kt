@@ -2,12 +2,14 @@ package com.dfsek.terra.biometool
 
 import com.dfsek.terra.api.Platform
 import javafx.application.Platform.exit
+import javafx.scene.control.Label
 import javafx.scene.control.TabPane
 import javafx.scene.image.WritableImage
 import javafx.scene.layout.VBox
 import net.jafama.FastMath
 import org.slf4j.LoggerFactory
 import tornadofx.*
+import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
 
@@ -27,18 +29,21 @@ class BiomeToolView : View("Biome Tool") {
 
     override val root = vbox {
         val tabPane = TabPane()
-        hbox {
+        hbox(5) {
+            val biome = Label()
             val select = combobox<String> {
                 items = platform.configRegistry.keys().toList().toObservable()
             }
             button("_Render").setOnAction {
                 val newTab = tabPane.tab("Render - ${select.selectedItem}") {
+                    val provider = platform.configRegistry[select.selectedItem].biomeProvider
                     imageview {
                         val img = WritableImage(FastMath.ceilToInt(width), FastMath.ceilToInt(this@vbox.height - 50))
                         image = img
-                        val canvas =
-                            BiomeCanvas(platform.configRegistry[select.selectedItem].biomeProvider, img)
+                        val canvas = BiomeCanvas(provider, img)
                         canvas.redraw()
+                    }.setOnMouseMoved {
+                        biome.text = provider.getBiome(it.x.roundToInt(), it.y.roundToInt(), 0).id
                     }
                 }
                 tabPane.selectionModel.select(newTab)
@@ -46,6 +51,7 @@ class BiomeToolView : View("Biome Tool") {
             button("Reload _Packs").setOnAction {
                 platform.reload()
             }
+            add(biome)
             maxHeight = 25.0
         }
         add(tabPane)
