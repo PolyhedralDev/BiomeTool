@@ -174,6 +174,10 @@ tasks.withType<Jar>() {
 }
 
 tasks.withType<JavaExec>() {
+    val runDir = file("$buildDir/run")
+    runDir.mkdirs()
+    
+    workingDir = runDir
     @Suppress("UselessCallOnNotNull") // Thanks Kotlin
     jvmArgs = jvmArgs.orEmpty() + listOf("--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
 }
