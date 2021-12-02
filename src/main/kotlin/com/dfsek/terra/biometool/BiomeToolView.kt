@@ -14,6 +14,7 @@ import tornadofx.combobox
 import tornadofx.filterInput
 import tornadofx.hbox
 import tornadofx.imageview
+import tornadofx.importStylesheet
 import tornadofx.isLong
 import tornadofx.label
 import tornadofx.selectedItem
@@ -41,6 +42,8 @@ class BiomeToolView : View("Biome Tool") {
     }
     
     override val root = vbox {
+        importStylesheet("/javafx-darktheme.css")
+        
         val tabPane = TabPane()
         hbox(5) {
             val seed = TextField()
