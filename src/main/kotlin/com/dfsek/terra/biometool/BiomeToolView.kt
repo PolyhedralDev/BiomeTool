@@ -36,7 +36,7 @@ class BiomeToolView : View("Biome Tool") {
             exitProcess(0)
         }
         logger.info("Initializing platform...")
-        platform = PlatformImpl() // create and initialize platform
+        platform = BiomeToolPlatform() // create and initialize platform
         logger.info("Platform initialized.")
     }
     

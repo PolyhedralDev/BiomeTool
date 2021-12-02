@@ -20,7 +20,7 @@ import org.slf4j.kotlin.getLogger
 import java.io.File
 import java.lang.reflect.AnnotatedType
 
-class PlatformImpl : AbstractPlatform() {
+class BiomeToolPlatform : AbstractPlatform() {
     private val logger by getLogger()
     
     init {
