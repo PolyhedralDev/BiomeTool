@@ -17,6 +17,7 @@ import com.dfsek.terra.biometool.dummy.DummyEnchantment
 import com.dfsek.terra.biometool.dummy.DummyEntityType
 import com.dfsek.terra.biometool.dummy.DummyItem
 import org.slf4j.kotlin.getLogger
+import org.slf4j.kotlin.info
 import java.io.File
 import java.lang.reflect.AnnotatedType
 
@@ -24,10 +25,10 @@ class BiomeToolPlatform : AbstractPlatform() {
     private val logger by getLogger()
     
     init {
-        logger.info("Root directory: ${dataFolder.absoluteFile}")
+        logger.info { "Root directory: ${dataFolder.absoluteFile}" }
         load()
         eventManager.callEvent(PlatformInitializationEvent())
-        logger.info("Enabled Terra platform.")
+        logger.info { "Enabled Terra platform." }
     }
     
     override fun reload(): Boolean {

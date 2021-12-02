@@ -4,47 +4,41 @@ import com.dfsek.terra.api.world.biome.generation.BiomeProvider
 import javafx.application.Platform
 import javafx.scene.image.WritableImage
 import net.jafama.FastMath
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.slf4j.kotlin.getLogger
-import java.awt.Canvas
-import java.awt.Color
-import java.awt.Graphics
-import java.awt.event.ComponentEvent
-import java.awt.event.ComponentListener
+import org.slf4j.kotlin.info
 import java.util.concurrent.Executors
 
 class BiomeCanvas(private val provider: BiomeProvider, private val img: WritableImage, private val seed: Long, var chunkSize: Int = 32) {
     private val logger by getLogger()
-
+    
     private var width = FastMath.ceilToInt(img.width)
     private var height = FastMath.ceilToInt(img.height)
-
-
+    
     private val threads = Runtime.getRuntime().availableProcessors().takeIf { it > 1 } ?: 1
     private var executor = Executors.newFixedThreadPool(threads)
-
+    
     fun redraw() {
-        logger.info("Redrawing ${width}x$height")
-        for(x in 0 until FastMath.floorDiv(width, chunkSize)+1) {
-            for(z in 0 until FastMath.floorDiv(height, chunkSize)+1) {
+        logger.info { "Redrawing canvas with wxh:${width}x$height" }
+        
+        for (x in 0 until FastMath.floorDiv(width, chunkSize) + 1) {
+            for (z in 0 until FastMath.floorDiv(height, chunkSize) + 1) {
                 executor.submit {
                     try {
                         val originX = x * chunkSize
                         val originZ = z * chunkSize
-
+                        
                         val data = Array(chunkSize) { xi ->
                             IntArray(chunkSize) { zi ->
-                                provider.getBiome(originX+xi, originZ+zi, seed).color
+                                provider.getBiome(originX + xi, originZ + zi, seed).color
                             }
                         }
-
+                        
                         Platform.runLater {
                             data.forEachIndexed { xi: Int, arr: IntArray ->
                                 arr.forEachIndexed { zi: Int, color: Int ->
                                     val fx = originX + xi
                                     val fz = originZ + zi
-                                    if(fx < width && fz < height) {
+                                    if (fx < width && fz < height) {
                                         img.pixelWriter.setArgb(fx, fz, color)
                                     }
                                 }

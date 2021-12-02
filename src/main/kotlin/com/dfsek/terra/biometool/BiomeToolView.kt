@@ -8,6 +8,7 @@ import javafx.scene.control.TextField
 import javafx.scene.image.WritableImage
 import net.jafama.FastMath
 import org.slf4j.kotlin.getLogger
+import org.slf4j.kotlin.info
 import tornadofx.View
 import tornadofx.button
 import tornadofx.combobox
@@ -36,9 +37,10 @@ class BiomeToolView : View("Biome Tool") {
             exit()
             exitProcess(0)
         }
-        logger.info("Initializing platform...")
+        
+        logger.info { "Initializing Terra platform..." }
         platform = BiomeToolPlatform() // create and initialize platform
-        logger.info("Platform initialized.")
+        logger.info { "Terra platform initialized successfully" }
     }
     
     override val root = vbox {
