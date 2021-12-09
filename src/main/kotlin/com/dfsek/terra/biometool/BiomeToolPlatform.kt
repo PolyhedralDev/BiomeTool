@@ -3,15 +3,12 @@ package com.dfsek.terra.biometool
 import com.dfsek.tectonic.loading.ConfigLoader
 import com.dfsek.tectonic.loading.TypeRegistry
 import com.dfsek.terra.AbstractPlatform
-import com.dfsek.terra.api.block.state.BlockState
 import com.dfsek.terra.api.event.events.platform.PlatformInitializationEvent
 import com.dfsek.terra.api.handle.ItemHandle
 import com.dfsek.terra.api.handle.WorldHandle
 import com.dfsek.terra.api.inventory.item.Enchantment
-import com.dfsek.terra.api.util.vector.Vector3
 import com.dfsek.terra.api.world.biome.Biome
-import com.dfsek.terra.biometool.dummy.DummyBiome
-import com.dfsek.terra.biometool.dummy.DummyBlockEntity
+import com.dfsek.terra.biometool.dummy.DummyPlatformBiome
 import com.dfsek.terra.biometool.dummy.DummyBlockState
 import com.dfsek.terra.biometool.dummy.DummyEnchantment
 import com.dfsek.terra.biometool.dummy.DummyEntityType
@@ -41,13 +38,11 @@ class BiomeToolPlatform : AbstractPlatform() {
     }
     
     override fun getWorldHandle() = object : WorldHandle {
-        override fun createBlockData(p0: String?) = DummyBlockState()
+        override fun createBlockData(p0: String) = DummyBlockState()
         
         override fun air() = DummyBlockState()
-        
-        override fun createBlockEntity(p0: Vector3?, p1: BlockState?, p2: String?) = DummyBlockEntity()
-        
-        override fun getEntity(p0: String?) = DummyEntityType()
+
+        override fun getEntity(p0: String) = DummyEntityType()
     }
     
     
@@ -58,7 +53,7 @@ class BiomeToolPlatform : AbstractPlatform() {
     override fun register(registry: TypeRegistry?) {
         super.register(registry)
         registry?.registerLoader(Biome::class.java) { _: AnnotatedType, _: Any, _: ConfigLoader ->
-            return@registerLoader DummyBiome()
+            return@registerLoader DummyPlatformBiome()
         }
     }
     

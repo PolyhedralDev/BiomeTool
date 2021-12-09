@@ -61,7 +61,7 @@ class BiomeToolView : View("Biome Tool") {
             button("_Render").setOnAction {
                 val tempSeed = seed.text.toLong()
                 val newTab = tabPane.tab("${select.selectedItem}:$tempSeed") {
-                    val provider = platform.configRegistry[select.selectedItem].biomeProvider
+                    val provider = platform.configRegistry[select.selectedItem!!].get().biomeProvider
                     imageview {
                         val img = WritableImage(FastMath.ceilToInt(width), FastMath.ceilToInt(this@vbox.height - 50))
                         image = img

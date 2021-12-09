@@ -71,7 +71,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     
-    implementation("com.dfsek.terra:base:6.0.0-BETA+d0872f42")
+    implementation("com.dfsek.terra:base:6.0.0-BETA+e1e851d6")
     
     implementation("ca.solo-studios:slf4k:0.3.1")
     
