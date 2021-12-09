@@ -29,6 +29,7 @@ dependencies {
 
     implementation("ca.solo-studios:slf4k:0.3.1")
 
+    implementation("ch.qos.logback:logback-classic:1.2.7")
 
     implementation("com.google.guava:guava:31.0.1-jre")
 
