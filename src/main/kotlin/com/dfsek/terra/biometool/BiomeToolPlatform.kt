@@ -8,6 +8,7 @@ import com.dfsek.terra.api.handle.ItemHandle
 import com.dfsek.terra.api.handle.WorldHandle
 import com.dfsek.terra.api.inventory.item.Enchantment
 import com.dfsek.terra.api.world.biome.Biome
+import com.dfsek.terra.api.world.biome.PlatformBiome
 import com.dfsek.terra.biometool.dummy.DummyPlatformBiome
 import com.dfsek.terra.biometool.dummy.DummyBlockState
 import com.dfsek.terra.biometool.dummy.DummyEnchantment
@@ -52,7 +53,7 @@ class BiomeToolPlatform : AbstractPlatform() {
     
     override fun register(registry: TypeRegistry?) {
         super.register(registry)
-        registry?.registerLoader(Biome::class.java) { _: AnnotatedType, _: Any, _: ConfigLoader ->
+        registry?.registerLoader(PlatformBiome::class.java) { _: AnnotatedType, _: Any, _: ConfigLoader ->
             return@registerLoader DummyPlatformBiome()
         }
     }
