@@ -7,6 +7,8 @@ import com.dfsek.terra.biometool.util.mapview
 import com.dfsek.terra.biometool.util.processors
 import com.dfsek.terra.biometool.util.runtime
 import javafx.application.Platform.exit
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
@@ -22,6 +24,7 @@ import tornadofx.action
 import tornadofx.button
 import tornadofx.combobox
 import tornadofx.filterInput
+import tornadofx.fitToParentHeight
 import tornadofx.fitToParentSize
 import tornadofx.hbox
 import tornadofx.importStylesheet
@@ -102,8 +105,12 @@ class BiomeToolView : View("Biome Tool") {
             }
         }
         
-        hbox(4) {
-            label("Pack")
+        hbox(6) {
+            label("Pack") {
+                padding = Insets(0.0, 0.0, 0.0, 8.0)
+                alignment = Pos.CENTER
+                fitToParentHeight()
+            }
             
             packSelection = combobox {
                 val configs = platform.configRegistry.keys().toList()
@@ -113,22 +120,20 @@ class BiomeToolView : View("Biome Tool") {
             }
             
             button("Rerender") {
-                setOnAction {
+                action {
                     tab()
                 }
             }
             
             button("Reload Packs") {
-                setOnAction {
-                    platform.reload()
-                    
-                    val configs = platform.configRegistry.keys().toList()
-                    
-                    packSelection.items = configs.toObservable()
-                }
+                action(::reload)
             }
             
-            label("Seed")
+            label("Seed") {
+                padding = Insets(0.0, 0.0, 0.0, 16.0)
+                alignment = Pos.CENTER
+                fitToParentHeight()
+            }
             
             seed = textfield {
                 text = "0"
@@ -136,7 +141,7 @@ class BiomeToolView : View("Biome Tool") {
             }
             
             button("Random Seed") {
-                setOnAction {
+                action {
                     seed.text = random.nextLong().toString()
                     
                     tab(seedLong = random.nextLong())

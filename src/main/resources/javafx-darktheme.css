@@ -461,7 +461,8 @@
 
 /* Tab */
 .tab-pane {
-    -fx-background-color: #007ACC;
+    /*-fx-background-color: #007ACC;*/
+    -fx-background-color: #1A1A1A;
     -fx-border-width: 1;
     -fx-border-color: transparent;
     -fx-background-insets: 25.5 0 0 0;
