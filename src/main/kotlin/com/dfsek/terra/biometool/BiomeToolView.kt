@@ -18,6 +18,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import org.slf4j.kotlin.*
 import tornadofx.View
+import tornadofx.action
 import tornadofx.button
 import tornadofx.combobox
 import tornadofx.filterInput
@@ -70,8 +71,12 @@ class BiomeToolView : View("Biome Tool") {
         
         menubar {
             menu("File") {
-                item("Reload")
-                item("Quit")
+                item("Reload") {
+                    action(::reload)
+                }
+                item("Quit") {
+                    action(::exitApplication)
+                }
             }
             menu("View") {
                 menu("Tool Windows") {
@@ -87,7 +92,9 @@ class BiomeToolView : View("Biome Tool") {
                 }
             }
             menu("Tools") {
-                item("Reload Pack")
+                item("Reload Packs") {
+                    action(::reload)
+                }
             }
             menu("Help") {
                 item("About")
@@ -147,6 +154,19 @@ class BiomeToolView : View("Biome Tool") {
         }
     }
     
+    private fun reload() {
+        platform.reload()
+        
+        val configs = platform.configRegistry.keys().toList()
+        
+        packSelection.items = configs.toObservable()
+    }
+    
+    private fun exitApplication() {
+        exit()
+        exitProcess(0)
+    }
+    
     private fun tab(
         selectedPack: String = packSelection.selectedItem!!,
         pack: ConfigPack = platform.configRegistry[selectedPack].get(),
@@ -163,8 +183,7 @@ class BiomeToolView : View("Biome Tool") {
     
     init {
         primaryStage.setOnCloseRequest {
-            exit()
-            exitProcess(0)
+            exitApplication()
         }
     }
     
@@ -180,7 +199,7 @@ class BiomeToolView : View("Biome Tool") {
         private val scheduledThreadPool: ScheduledExecutorService =
                 Executors.newScheduledThreadPool((runtime.processors).coerceAtLeast(1), BiomeToolThreadFactory)
         
-        val coroutineDispatcher: ExecutorCoroutineDispatcher = scheduledThreadPool.asCoroutineDispatcher()
+        private val coroutineDispatcher: ExecutorCoroutineDispatcher = scheduledThreadPool.asCoroutineDispatcher()
         
         val scope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
     }

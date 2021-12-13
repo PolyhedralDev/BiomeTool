@@ -23,12 +23,6 @@ class BiomeToolPlatform : AbstractPlatform() {
         logger.info { "Root directory: ${dataFolder.absoluteFile}" }
         load()
         logger.info { "Enabled Terra platform." }
-        
-        rawConfigRegistry.forEach { name, config ->
-            logger.info { "Config: $name, ${config.version}" }
-        }
-        
-        logger.info { "" }
     }
     
     override fun reload(): Boolean {
