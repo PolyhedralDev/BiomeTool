@@ -27,5 +27,21 @@ class OutputStreamAppender<E> : OutputStreamAppender<E>() {
             set(value) {
                 super.out = value
             }
+        
+        override fun flush() {
+            out.flush()
+        }
+        
+        override fun write(b: Int) {
+            out.write(b)
+        }
+        
+        override fun write(b: ByteArray) {
+            out.write(b)
+        }
+        
+        override fun write(b: ByteArray, off: Int, len: Int) {
+            out.write(b, off, len)
+        }
     }
 }
