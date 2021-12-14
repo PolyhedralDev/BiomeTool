@@ -89,9 +89,9 @@ dependencies {
     for (javafxModule in javafxModules) {
         val mavenCoordinates = "org.openjfx:javafx-$javafxModule:${javafx.version}"
         
-        linuxImplementation(mavenCoordinates)
-        windowsImplementation(mavenCoordinates)
-        osxImplementation(mavenCoordinates)
+        linuxImplementation("$mavenCoordinates:linux")
+        windowsImplementation("$mavenCoordinates:win")
+        osxImplementation("$mavenCoordinates:mac")
     }
 }
 
@@ -119,7 +119,8 @@ tasks.withType<ShadowJar>() {
     exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
     
     tasks.register<ConfigureShadowRelocation>(
-            ConfigureShadowRelocation.taskName(this)) {
+            ConfigureShadowRelocation.taskName(this)
+                                             ) {
         this@withType.dependsOn(this)
     }
     
@@ -166,10 +167,6 @@ tasks.withType<Jar>() {
                 "Main-Class" to mainClassName,
                 "Built-By" to System.getProperties()["user.name"],
                 "Built-Jdk" to System.getProperties()["java.version"],
-                "Implementation-Title" to project.version,
-                "Implementation-Version" to archiveVersion.get(),
-                "JavaFX-Version" to javafx.version,
-                "JavaFX-Application-Class" to mainClassName,
                 "Name" to project.name,
                 "Add-Opens" to "javafx.graphics/javafx.scene",
                   )
