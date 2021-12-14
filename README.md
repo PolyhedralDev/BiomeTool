@@ -30,4 +30,4 @@ Use Java 17
 
 ## Screenshots
 
-![screenshots/img.png](raw/master/screenshots/img.png)
+![screenshots/img.png](screenshots/img.png)
