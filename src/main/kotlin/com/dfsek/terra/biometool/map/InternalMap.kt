@@ -7,7 +7,6 @@ import com.dfsek.terra.biometool.util.squash
 import javafx.application.Platform
 import javafx.scene.Group
 import kotlinx.coroutines.CoroutineScope
-import org.slf4j.kotlin.*
 import tornadofx.doubleProperty
 import tornadofx.minusAssign
 import tornadofx.onChange
@@ -18,8 +17,6 @@ class InternalMap(
     val tileSize: Int,
     val tileGenerator: BiomeImageGenerator
                  ) : Group() {
-    private val logger by getLogger()
-    
     private val tiles: MutableMap<Long, SoftReference<MapTile>> = mutableMapOf()
     
     private val centerX = doubleProperty(0.0)

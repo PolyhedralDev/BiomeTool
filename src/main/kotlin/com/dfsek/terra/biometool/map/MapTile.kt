@@ -1,11 +1,10 @@
 package com.dfsek.terra.biometool.map
 
 import javafx.scene.layout.Region
-import org.slf4j.kotlin.*
 
 class MapTile(
-    val point: MapTilePoint,
-    val internalMap: InternalMap,
+    point: MapTilePoint,
+    private val internalMap: InternalMap,
              ) : Region() {
     private val tileSize: Int
         get() = internalMap.tileSize
@@ -22,9 +21,5 @@ class MapTile(
         
         isMouseTransparent = true
         isVisible = true
-    }
-    
-    companion object {
-        private val logger by getLogger()
     }
 }
