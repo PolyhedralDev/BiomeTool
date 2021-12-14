@@ -58,6 +58,8 @@ class BiomeToolView : View("Biome Tool") {
     
     private val platform: Platform
     
+    private var toolWindows by singleAssign<ToolWindows>()
+    
     private var seed by singleAssign<TextField>()
     
     private var packSelection by singleAssign<ComboBox<String>>()
@@ -92,15 +94,33 @@ class BiomeToolView : View("Biome Tool") {
             }
             menu("View") {
                 menu("Tool Windows") {
-                    item("World Preview")
-                    item("Console")
-                    item("Performance")
+                    item("World Preview") {
+                        action {
+                            toolWindows.worldPreview.select()
+                        }
+                    }
+                    item("Console") {
+                        action {
+                            toolWindows.console.select()
+                        }
+                    }
+                    item("Performance") {
+                        action {
+                            toolWindows.console.select()
+                        }
+                    }
                 }
                 menu("Appearance") {
-                    item("Change Theme")
+                    isDisable = true
+                    item("Change Theme") {
+                        isDisable = true
+                    }
                 }
                 menu("Overlay") {
-                    item("Chunk Borders")
+                    isDisable = true
+                    item("Chunk Borders") {
+                        isDisable = true
+                    }
                 }
             }
             menu("Tools") {
@@ -109,8 +129,12 @@ class BiomeToolView : View("Biome Tool") {
                 }
             }
             menu("Help") {
-                item("About")
-                item("License")
+                item("About") {
+                    isDisable = true
+                }
+                item("License") {
+                    isDisable = true
+                }
             }
         }
         
@@ -118,7 +142,7 @@ class BiomeToolView : View("Biome Tool") {
             tabClosingPolicy = TabClosingPolicy.UNAVAILABLE
             fitToParentSize()
             
-            tab("World Preview") {
+            val worldPreview = tab("World Preview") {
                 vbox {
                     hbox(6) {
                         label("Pack") {
@@ -174,7 +198,7 @@ class BiomeToolView : View("Biome Tool") {
                     }
                 }
             }
-            tab("Performance") {
+            val performance = tab("Performance") {
                 textarea {
                     font = Font(30.0)
                     text = """
@@ -186,7 +210,7 @@ class BiomeToolView : View("Biome Tool") {
                 fitToParentSize()
                 
             }
-            tab("Console") {
+            val console = tab("Console") {
                 vbox {
                     styleClass += "console"
                     add(consoleTextArea)
@@ -196,6 +220,8 @@ class BiomeToolView : View("Biome Tool") {
                 }
                 fitToParentSize()
             }
+            
+            toolWindows = ToolWindows(worldPreview, performance, console)
         }
     }
     
@@ -248,5 +274,11 @@ class BiomeToolView : View("Biome Tool") {
         
         val scope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
     }
+    
+    internal data class ToolWindows(
+        val worldPreview: Tab,
+        val performance: Tab,
+        val console: Tab,
+                                   )
     
 }
