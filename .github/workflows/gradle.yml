@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 17
@@ -18,8 +18,10 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
       - name: Build with Gradle
-        run: ./gradlew shadowJar
+        run:  ./gradlew shadowJar
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/libs/BiomeTool-*-all.jar
+          body:  "Please download the jar specific to your platform.
+          Or, if you're not sure which jar to use, then use the `-all.jar` file."
+          files: build/libs/BiomeTool-*-{all,win,osx,linux}.jar
