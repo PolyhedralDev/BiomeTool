@@ -64,7 +64,7 @@
             <!--<level>DEBUG</level>-->
         </filter>
         <encoder>
-            <pattern>%d %-26([%.-28(%thread)]) %-5level %-48logger{48} - %msg{}%n{}%ex{full, DISPLAY_EX_EVAL}</pattern>
+            <pattern>%-7([%level]) %-48logger{48} - %msg{}%n{}%ex{full, DISPLAY_EX_EVAL}</pattern>
         </encoder>
     </appender>
 
