@@ -14,7 +14,7 @@ var mainClassName: String by application.mainClass
 mainClassName = "com.dfsek.terra.biometool.BiomeToolLauncher"
 
 group = "com.dfsek"
-version = "0.3.1"
+version = "0.4.0"
 
 repositories {
     mavenCentral()
