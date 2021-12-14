@@ -57,14 +57,27 @@
             <pattern>%d %-32([%.-30(%thread)]) %-5level %-64logger{64} - %msg{}%n{}%ex{full, DISPLAY_EX_EVAL}</pattern>
         </encoder>
     </appender>
+    <appender name="JavaFXConsole" class="com.dfsek.terra.biometool.logback.OutputStreamAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+            <!-- Currently is very laggy -->
+            <!--<level>DEBUG</level>-->
+        </filter>
+        <encoder>
+            <pattern>%d %-26([%.-28(%thread)]) %-5level %-48logger{48} - %msg{}%n{}%ex{full, DISPLAY_EX_EVAL}</pattern>
+        </encoder>
+    </appender>
 
     <logger level="DEBUG" name="com.dfsek.terra" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
+        <appender-ref ref="JavaFXConsole"/>
     </logger>
     <root level="INFO">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="JavaFXConsole"/>
+
     </root>
     <!--    <logger level="INFO">-->
     <!--        <appender-ref ref="STDOUT"/>-->

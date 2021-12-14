@@ -607,3 +607,13 @@
     -fx-text-fill: #AFB1B3;
     -fx-padding: 5;
 }
+
+/* Console */
+
+.console .content {
+
+}
+
+.console .text-area {
+    -fx-font-family: monospace;
+}

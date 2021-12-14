@@ -40,8 +40,6 @@ class InternalMap(
         translateX = x * tileSize
         translateY = y * tileSize
         
-        logger.debug { "center: $x, $y" }
-        
         shouldUpdate()
     }
     
@@ -54,14 +52,11 @@ class InternalMap(
     }
     
     private fun updateTiles() {
-        logger.debug { "Starting tile update" }
         
         val xMin = floorToInt(-1 * centerX.value) - 1
         val yMin = floorToInt(-1 * centerY.value) - 1
         val xMax = ceilToInt((-1 * centerX.value) + width) + 1
         val yMax = ceilToInt((-1 * centerY.value) + height) + 1
-        
-        logger.debug { "xMin: $xMin, yMin: $yMin, xMax: $xMax, yMax: $yMax" }
         
         for (x in xMin until xMax) {
             for (y in yMin until yMax) {
@@ -107,8 +102,6 @@ class InternalMap(
         if (isShouldUpdate) {
             updateTiles()
             isShouldUpdate = false
-        } else {
-            logger.debug { "shouldn't update" }
         }
         super.layoutChildren()
     }

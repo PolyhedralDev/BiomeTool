@@ -13,8 +13,6 @@ class MapTile(
     private val tile = MapTileImageView(point, internalMap)
     
     init {
-        logger.trace { "Load image: $point" }
-        
         translateX = (point.x * tileSize).toDouble()
         translateY = (point.y * tileSize).toDouble()
         
