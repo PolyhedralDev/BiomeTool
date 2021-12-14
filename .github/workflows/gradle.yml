@@ -18,10 +18,14 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
       - name: Build with Gradle
-        run:  ./gradlew shadowJar
+        run:  ./gradlew build
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           body:  "Please download the jar specific to your platform.
           Or, if you're not sure which jar to use, then use the `-all.jar` file."
-          files: build/libs/BiomeTool-*-{all,win,osx,linux}.jar
+          files: |
+                 build/libs/BiomeTool-*-all.jar
+                 build/libs/BiomeTool-*-win.jar
+                 build/libs/BiomeTool-*-osx.jar
+                 build/libs/BiomeTool-*-linux.jar
