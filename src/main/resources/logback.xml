@@ -59,9 +59,7 @@
     </appender>
     <appender name="JavaFXConsole" class="com.dfsek.terra.biometool.logback.OutputStreamAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-            <!-- Currently is very laggy -->
-            <!--<level>DEBUG</level>-->
+            <level>DEBUG</level>
         </filter>
         <encoder>
             <pattern>%-7([%level]) %-48logger{48} - %msg{}%n{}%ex{full, DISPLAY_EX_EVAL}</pattern>
