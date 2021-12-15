@@ -112,7 +112,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
     
-    implementation("com.dfsek.terra:base:6.0.0-BETA+e1e851d6")
+    implementation("com.dfsek.terra:base:6.0.0-BETA+$terraGitHash")
     
     implementation("ca.solo-studios:slf4k:0.4.3")
     

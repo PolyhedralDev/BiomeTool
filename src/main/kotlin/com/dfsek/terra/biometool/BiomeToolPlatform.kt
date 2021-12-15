@@ -1,7 +1,7 @@
 package com.dfsek.terra.biometool
 
-import com.dfsek.tectonic.loading.ConfigLoader
-import com.dfsek.tectonic.loading.TypeRegistry
+import com.dfsek.tectonic.api.TypeRegistry
+import com.dfsek.tectonic.api.loader.ConfigLoader
 import com.dfsek.terra.AbstractPlatform
 import com.dfsek.terra.api.handle.ItemHandle
 import com.dfsek.terra.api.handle.WorldHandle
