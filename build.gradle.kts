@@ -16,11 +16,17 @@ mainClassName = "com.dfsek.terra.biometool.BiomeToolLauncher"
 group = "com.dfsek"
 version = "0.4.1"
 
+val runDir = file("$buildDir/run")
+
 repositories {
     mavenCentral()
     maven {
         name = "CodeMC"
         url = uri("https://repo.codemc.org/repository/maven-public/")
+    }
+    maven {
+        name = "Jitpack"
+        url = uri("https://jitpack.io")
     }
 }
 
@@ -49,6 +55,7 @@ val shadow: Configuration by configurations.getting
 val compileOnly: Configuration by configurations.compileOnly
 val compileClasspath: Configuration by configurations.compileClasspath
 val implementation: Configuration by configurations.implementation
+val runtimeClasspath: Configuration by configurations.runtimeClasspath
 
 val linuxImplementation: Configuration by configurations.creating {
     extendsFrom(implementation)
@@ -66,10 +73,41 @@ compileClasspath.extendsFrom(linuxImplementation)
 compileClasspath.extendsFrom(windowsImplementation)
 compileClasspath.extendsFrom(osxImplementation)
 
+val terraAddon: Configuration by configurations.creating {
+    runtimeClasspath.extendsFrom(this)
+}
+val bootstrapTerraAddon: Configuration by configurations.creating {
+    runtimeClasspath.extendsFrom(this)
+}
+
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
+    
+    val terraGitHash = "f6d52959"
+    
+    bootstrapTerraAddon("com.dfsek.terra:api-addon-loader:0.1.0-BETA+$terraGitHash")
+    bootstrapTerraAddon("com.dfsek.terra:manifest-addon-loader:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:biome-provider-image:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:biome-provider-pipeline:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:biome-provider-single:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:chunk-generator-noise-3d:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-biome:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-distributors:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-feature:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-flora:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-locators:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-noise-function:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-ore:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-palette:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-structure:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:generation-stage-feature:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:generation-stage-structure:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:language-yaml:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:structure-sponge-loader:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:structure-terrascript-loader:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:terrascript-function-check-noise-3d:0.1.0-BETA+$terraGitHash")
     
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
@@ -173,8 +211,26 @@ tasks.withType<Jar>() {
     }
 }
 
-tasks.withType<JavaExec>() {
-    val runDir = file("$buildDir/run")
+val prepareRunAddons by tasks.creating(Sync::class) {
+    group = "application"
+    val terraAddonJars = terraAddon.resolvedConfiguration.firstLevelModuleDependencies.flatMap { dependency ->
+        dependency.moduleArtifacts.map { it.file }
+    }
+    val terraBoostrapJars = bootstrapTerraAddon.resolvedConfiguration.firstLevelModuleDependencies.flatMap { dependency ->
+        dependency.moduleArtifacts.map { it.file }
+    }
+    
+    from(terraAddonJars)
+    
+    from(terraBoostrapJars) {
+        into("bootstrap")
+    }
+    
+    into("$runDir/addons")
+}
+
+tasks.getByName<JavaExec>("run") {
+    dependsOn(prepareRunAddons)
     runDir.mkdirs()
     
     workingDir = runDir
