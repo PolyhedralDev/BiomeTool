@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URL
 
 plugins {
     application
@@ -211,6 +212,18 @@ tasks.withType<Jar>() {
     }
 }
 
+val downloadDefaultPacks: Task by tasks.creating() {
+    group = "application"
+    
+    doFirst {
+        val defaultPack = URL("https://github.com/PolyhedralDev/TerraOverworldConfig/releases/download/latest/default.zip")
+        val fileName = defaultPack.file.substring(defaultPack.file.lastIndexOf("/"))
+        
+        defaultPack.openStream().transferTo(file("$runDir/packs/$fileName").outputStream())
+    }
+    
+}
+
 val prepareRunAddons by tasks.creating(Sync::class) {
     group = "application"
     val terraAddonJars = terraAddon.resolvedConfiguration.firstLevelModuleDependencies.flatMap { dependency ->
@@ -230,7 +243,7 @@ val prepareRunAddons by tasks.creating(Sync::class) {
 }
 
 tasks.getByName<JavaExec>("run") {
-    dependsOn(prepareRunAddons)
+    dependsOn(prepareRunAddons, downloadDefaultPacks)
     runDir.mkdirs()
     
     workingDir = runDir
