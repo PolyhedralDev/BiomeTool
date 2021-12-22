@@ -3,7 +3,7 @@ package com.dfsek.terra.biometool.dummy
 import com.dfsek.terra.api.inventory.ItemStack
 import com.dfsek.terra.api.inventory.item.ItemMeta
 
-class DummyItemStack : ItemStack {
+object DummyItemStack : ItemStack {
     override fun getHandle() = this
 
     override fun getAmount() = 0
@@ -11,9 +11,9 @@ class DummyItemStack : ItemStack {
     override fun setAmount(p0: Int) {
     }
 
-    override fun getType() = DummyItem()
+    override fun getType() = DummyItem
 
-    override fun getItemMeta() = DummyItemMeta()
+    override fun getItemMeta() = DummyItemMeta
 
     override fun setItemMeta(p0: ItemMeta?) {
     }

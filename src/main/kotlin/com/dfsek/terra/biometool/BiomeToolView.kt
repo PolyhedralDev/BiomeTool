@@ -72,7 +72,7 @@ class BiomeToolView : View("Biome Tool") {
     
     init {
         logger.info { "Initializing Terra platform..." }
-        platform = BiomeToolPlatform() // create and initialize platform
+        platform = BiomeToolPlatform // create and initialize platform
         platform.reload()
         logger.info { "Terra platform initialized successfully" }
     }

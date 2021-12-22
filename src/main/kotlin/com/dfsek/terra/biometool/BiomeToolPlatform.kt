@@ -11,7 +11,7 @@ import org.slf4j.kotlin.*
 import java.io.File
 import java.lang.reflect.AnnotatedType
 
-class BiomeToolPlatform : AbstractPlatform() {
+object BiomeToolPlatform : AbstractPlatform() {
     private val logger by getLogger()
     
     init {
@@ -29,7 +29,7 @@ class BiomeToolPlatform : AbstractPlatform() {
         return "Biome Tool"
     }
     
-    override fun getWorldHandle() = DummyWorldHandle()
+    override fun getWorldHandle() = DummyWorldHandle
     
     
     override fun getDataFolder(): File {
@@ -39,9 +39,9 @@ class BiomeToolPlatform : AbstractPlatform() {
     override fun register(registry: TypeRegistry?) {
         super.register(registry)
         registry?.registerLoader(PlatformBiome::class.java) { _: AnnotatedType, _: Any, _: ConfigLoader ->
-            return@registerLoader DummyPlatformBiome()
+            return@registerLoader DummyPlatformBiome
         }
     }
     
-    override fun getItemHandle() = DummyItemHandle()
+    override fun getItemHandle() = DummyItemHandle
 }
