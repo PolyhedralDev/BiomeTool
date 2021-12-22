@@ -86,7 +86,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     
-    val terraGitHash = "f6d52959"
+    val terraGitHash = "49211bf6e"
     
     bootstrapTerraAddon("com.dfsek.terra:api-addon-loader:0.1.0-BETA+$terraGitHash")
     bootstrapTerraAddon("com.dfsek.terra:manifest-addon-loader:0.1.0-BETA+$terraGitHash")
@@ -109,6 +109,7 @@ dependencies {
     terraAddon("com.dfsek.terra:structure-sponge-loader:0.1.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:structure-terrascript-loader:0.1.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:terrascript-function-check-noise-3d:0.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:palette-block-shortcut:0.1.0-BETA+$terraGitHash")
     
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
@@ -124,6 +125,8 @@ dependencies {
     implementation("no.tornado:tornadofx:1.7.20") {
         exclude("org.jetbrains.kotlin")
     }
+    
+    implementation("commons-io:commons-io:2.11.0")
     
     for (javafxModule in javafxModules) {
         val mavenCoordinates = "org.openjfx:javafx-$javafxModule:${javafx.version}"
