@@ -219,6 +219,8 @@ val downloadDefaultPacks: Task by tasks.creating() {
         val defaultPack = URL("https://github.com/PolyhedralDev/TerraOverworldConfig/releases/download/latest/default.zip")
         val fileName = defaultPack.file.substring(defaultPack.file.lastIndexOf("/"))
         
+        file("$runDir/packs/").mkdirs()
+        
         defaultPack.openStream().transferTo(file("$runDir/packs/$fileName").outputStream())
     }
     
