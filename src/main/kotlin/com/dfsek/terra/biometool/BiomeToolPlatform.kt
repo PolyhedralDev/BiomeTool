@@ -1,6 +1,7 @@
 package com.dfsek.terra.biometool
 
 import com.dfsek.tectonic.api.TypeRegistry
+import com.dfsek.tectonic.api.depth.DepthTracker
 import com.dfsek.tectonic.api.loader.ConfigLoader
 import com.dfsek.terra.AbstractPlatform
 import com.dfsek.terra.api.world.biome.PlatformBiome
@@ -38,7 +39,7 @@ object BiomeToolPlatform : AbstractPlatform() {
     
     override fun register(registry: TypeRegistry?) {
         super.register(registry)
-        registry?.registerLoader(PlatformBiome::class.java) { _: AnnotatedType, _: Any, _: ConfigLoader ->
+        registry?.registerLoader(PlatformBiome::class.java) { _: AnnotatedType, _: Any, _: ConfigLoader, _: DepthTracker ->
             return@registerLoader DummyPlatformBiome
         }
     }

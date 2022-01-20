@@ -2,6 +2,7 @@ package com.dfsek.terra.biometool
 
 import com.dfsek.terra.api.Platform
 import com.dfsek.terra.api.config.ConfigPack
+import com.dfsek.terra.api.registry.key.RegistryKey
 import com.dfsek.terra.biometool.console.TextAreaOutputStream
 import com.dfsek.terra.biometool.logback.OutputStreamAppender
 import com.dfsek.terra.biometool.util.currentThread
@@ -62,7 +63,7 @@ class BiomeToolView : View("Biome Tool") {
     
     private var seed by singleAssign<TextField>()
     
-    private var packSelection by singleAssign<ComboBox<String>>()
+    private var packSelection by singleAssign<ComboBox<RegistryKey>>()
     
     private var renderTabs by singleAssign<TabPane>()
     
@@ -239,7 +240,7 @@ class BiomeToolView : View("Biome Tool") {
     }
     
     private fun addBiomeViewTab(
-        selectedPack: String = packSelection.selectedItem!!,
+        selectedPack: RegistryKey = packSelection.selectedItem!!,
         pack: ConfigPack = platform.configRegistry[selectedPack].get(),
         seedLong: Long = seed.text.toLong(),
                                ): Tab {
