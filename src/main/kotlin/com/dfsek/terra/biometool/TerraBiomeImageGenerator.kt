@@ -20,7 +20,7 @@ class TerraBiomeImageGenerator(
         
         val data = Array(tileSize) { xi ->
             IntArray(tileSize) { yi ->
-                provider.getBiome(x * tileSize + xi, y * tileSize + yi, seed).color
+                provider.getBiome(x * tileSize + xi, 0, y * tileSize + yi, seed).color
             }
         }
         
