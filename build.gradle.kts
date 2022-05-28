@@ -6,7 +6,7 @@ import java.net.URL
 
 plugins {
     application
-    kotlin("jvm") version "1.6.0"
+    kotlin("jvm") version "1.6.10"
     id("org.openjfx.javafxplugin") version "0.0.10"
     id("com.github.johnrengelman.shadow") version "7.1.0"
 }
@@ -15,7 +15,7 @@ var mainClassName: String by application.mainClass
 mainClassName = "com.dfsek.terra.biometool.BiomeToolLauncher"
 
 group = "com.dfsek"
-version = "0.4.1"
+version = "0.4.4"
 
 val runDir = file("$buildDir/run")
 
@@ -118,11 +118,11 @@ dependencies {
     
     implementation("com.dfsek.terra:base:6.0.0-BETA+$terraGitHash")
     
-    implementation("ca.solo-studios:slf4k:0.4.3")
+    implementation("ca.solo-studios:slf4k:0.4.6")
     
-    implementation("ch.qos.logback:logback-classic:1.2.7")
+    implementation("ch.qos.logback:logback-classic:1.2.11")
     
-    implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("com.google.guava:guava:31.1-jre")
     
     implementation("no.tornado:tornadofx:1.7.20") {
         exclude("org.jetbrains.kotlin")
@@ -137,6 +137,9 @@ dependencies {
         windowsImplementation("$mavenCoordinates:win")
         osxImplementation("$mavenCoordinates:mac")
     }
+    
+    // Jansi for terminal colouring on Windows
+    windowsImplementation("org.fusesource.jansi:jansi:2.4.0")
 }
 
 tasks.test {
