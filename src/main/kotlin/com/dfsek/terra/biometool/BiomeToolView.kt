@@ -13,6 +13,7 @@ import javafx.application.Platform.exit
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.ComboBox
+import javafx.scene.control.Label
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.control.TabPane.TabClosingPolicy
@@ -50,6 +51,7 @@ import tornadofx.vbox
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ThreadFactory
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.system.exitProcess
 
@@ -145,7 +147,7 @@ class BiomeToolView : View("Biome Tool") {
             
             val worldPreview = tab("World Preview") {
                 vbox {
-                    hbox(6) {
+                    val top = hbox(6) {
                         label("Pack") {
                             padding = Insets(0.0, 0.0, 0.0, 8.0)
                             alignment = Pos.CENTER
@@ -193,6 +195,12 @@ class BiomeToolView : View("Biome Tool") {
                         tabClosingPolicy = TabClosingPolicy.ALL_TABS
                         fitToParentSize()
                     }
+                    
+                    top.add(Label().apply {
+                        renderTabs.setOnMouseMoved {
+                            text = platform.configRegistry[packSelection.selectedItem!!].get().biomeProvider.getBiome(it.x.roundToInt(), 0, it.y.roundToInt(), 0).id
+                        }
+                    })
                     
                     if (packSelection.selectedItem != null) {
                         addBiomeViewTab(selectedPack = packSelection.selectedItem!!, seedLong = random.nextLong())
