@@ -15,8 +15,15 @@ class MapView(
     
     private val clip = Rectangle()
     
-    private var mouseDragX = 0.0
-    private var mouseDragY = 0.0
+    
+    var x = 0.0
+        private set
+    var y = 0.0
+        private set
+    
+    val seed = tileGenerator.seed
+    
+    val configPack = tileGenerator.configPack
     
     init {
         children += map
@@ -30,12 +37,19 @@ class MapView(
             map.prefWidth(it)
             map.shouldUpdate()
         }
+    
+        var mouseDragX = 0.0
+        var mouseDragY = 0.0
         
         setClip(clip)
+        var beginX = 0.0
+        var beginY = 0.0
         
         setOnMousePressed { event ->
             mouseDragX = event.x
             mouseDragY = event.y
+            beginX = event.x
+            beginY = event.y
         }
         setOnMouseDragged { event ->
             map.moveX((mouseDragX - event.x) / tileSize)
@@ -43,6 +57,10 @@ class MapView(
             
             mouseDragX = event.x
             mouseDragY = event.y
+        }
+        setOnMouseReleased { event ->
+            x += beginX - event.x
+            y += beginY - event.y
         }
     }
     

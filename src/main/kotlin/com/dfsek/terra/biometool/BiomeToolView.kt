@@ -73,6 +73,8 @@ class BiomeToolView : View("Biome Tool") {
         OutputStreamAppender.outputStream = TextAreaOutputStream(this)
     }
     
+    private val biomeID = Label()
+    
     init {
         logger.info { "Initializing Terra platform..." }
         platform = BiomeToolPlatform // create and initialize platform
@@ -189,18 +191,14 @@ class BiomeToolView : View("Biome Tool") {
                                 addBiomeViewTab(seedLong = random.nextLong())
                             }
                         }
+                        
+                        add(biomeID)
                     }
                     
                     renderTabs = tabpane {
                         tabClosingPolicy = TabClosingPolicy.ALL_TABS
                         fitToParentSize()
                     }
-                    
-                    top.add(Label().apply {
-                        renderTabs.setOnMouseMoved {
-                            text = platform.configRegistry[packSelection.selectedItem!!].get().biomeProvider.getBiome(it.x.roundToInt(), 0, it.y.roundToInt(), 0).id
-                        }
-                    })
                     
                     if (packSelection.selectedItem != null) {
                         addBiomeViewTab(selectedPack = packSelection.selectedItem!!, seedLong = random.nextLong())
@@ -255,8 +253,18 @@ class BiomeToolView : View("Biome Tool") {
         return renderTabs.tab("$selectedPack:$seedLong") {
             select()
             
-            mapview(BiomeToolView.scope, TerraBiomeImageGenerator(seedLong, pack), 128) {
+            val mapView = mapview(BiomeToolView.scope, TerraBiomeImageGenerator(seedLong, pack), 128) {
                 fitToParentSize()
+            }
+            mapView.setOnMouseMoved {
+                biomeID.text = mapView.configPack
+                        .biomeProvider
+                        .getBiome(
+                                it.x.roundToInt() + mapView.x.roundToInt(),
+                                0,
+                                it.y.roundToInt() + mapView.y.roundToInt(),
+                                mapView.seed
+                                 ).id
             }
         }
     }
@@ -271,7 +279,12 @@ class BiomeToolView : View("Biome Tool") {
         private val threadGroup: ThreadGroup = currentThread.threadGroup
         private var threadCount: Int = 0
         
-        override fun newThread(runnable: Runnable): Thread = Thread(threadGroup, runnable, "BiomeTool-Worker-${threadCount++}", 0)
+        override fun newThread(runnable: Runnable): Thread = Thread(
+                threadGroup,
+                runnable,
+                "BiomeTool-Worker-${threadCount++}",
+                0
+                                                                   )
     }
     
     companion object {
