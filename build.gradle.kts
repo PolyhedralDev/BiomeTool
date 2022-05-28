@@ -15,7 +15,7 @@ var mainClassName: String by application.mainClass
 mainClassName = "com.dfsek.terra.biometool.BiomeToolLauncher"
 
 group = "com.dfsek"
-version = "0.4.4"
+version = "0.4.5"
 
 val runDir = file("$buildDir/run")
 
