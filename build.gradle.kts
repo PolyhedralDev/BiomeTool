@@ -86,7 +86,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     
-    val terraGitHash = "b6b6cb185"
+    val terraGitHash = "a17560142"
     
     bootstrapTerraAddon("com.dfsek.terra:api-addon-loader:0.1.0-BETA+$terraGitHash")
     bootstrapTerraAddon("com.dfsek.terra:manifest-addon-loader:0.1.0-BETA+$terraGitHash")
