@@ -37,7 +37,7 @@ class MapView(
             map.prefWidth(it)
             map.shouldUpdate()
         }
-    
+        
         var mouseDragX = 0.0
         var mouseDragY = 0.0
         

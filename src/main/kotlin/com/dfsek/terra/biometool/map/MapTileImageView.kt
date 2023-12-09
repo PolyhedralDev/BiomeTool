@@ -3,7 +3,8 @@ package com.dfsek.terra.biometool.map
 import javafx.application.Platform
 import javafx.scene.image.ImageView
 import kotlinx.coroutines.launch
-import org.slf4j.kotlin.*
+import org.slf4j.kotlin.getLogger
+import org.slf4j.kotlin.warn
 
 class MapTileImageView(
     private val point: MapTilePoint,

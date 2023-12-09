@@ -8,7 +8,8 @@ It should work with most Terra addons, it's been tested extensively and verified
 
 ## Downloading
 
-To download the biome tool jar, go to the [releases page](https://github.com/PolyhedralDev/BiomeTool/releases/latest/), and you can find a selection of jars to download. Download the
+To download the biome tool jar, go to the [releases page](https://github.com/PolyhedralDev/BiomeTool/releases/latest/), and you can find a
+selection of jars to download. Download the
 correct one for your platform.
 
 - For Windows, download the `BiomeTool-*-win.jar` file.

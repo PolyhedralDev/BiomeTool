@@ -9,6 +9,9 @@ import com.dfsek.terra.biometool.util.currentThread
 import com.dfsek.terra.biometool.util.mapview
 import com.dfsek.terra.biometool.util.processors
 import com.dfsek.terra.biometool.util.runtime
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ThreadFactory
 import javafx.application.Platform.exit
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -24,7 +27,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
-import org.slf4j.kotlin.*
+import org.slf4j.kotlin.getLogger
+import org.slf4j.kotlin.info
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
@@ -48,9 +52,6 @@ import tornadofx.textarea
 import tornadofx.textfield
 import tornadofx.toObservable
 import tornadofx.vbox
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ThreadFactory
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.system.exitProcess
@@ -258,13 +259,13 @@ class BiomeToolView : View("Biome Tool") {
             }
             mapView.setOnMouseMoved {
                 biomeID.text = mapView.configPack
-                        .biomeProvider
-                        .getBiome(
-                                it.x.roundToInt() + mapView.x.roundToInt(),
-                                0,
-                                it.y.roundToInt() + mapView.y.roundToInt(),
-                                mapView.seed
-                                 ).id
+                    .biomeProvider
+                    .getBiome(
+                        it.x.roundToInt() + mapView.x.roundToInt(),
+                        0,
+                        it.y.roundToInt() + mapView.y.roundToInt(),
+                        mapView.seed
+                             ).id
             }
         }
     }
@@ -280,17 +281,17 @@ class BiomeToolView : View("Biome Tool") {
         private var threadCount: Int = 0
         
         override fun newThread(runnable: Runnable): Thread = Thread(
-                threadGroup,
-                runnable,
-                "BiomeTool-Worker-${threadCount++}",
-                0
+            threadGroup,
+            runnable,
+            "BiomeTool-Worker-${threadCount++}",
+            0
                                                                    )
     }
     
     companion object {
         private val random = Random(Random.nextLong())
         private val scheduledThreadPool: ScheduledExecutorService =
-                Executors.newScheduledThreadPool((runtime.processors).coerceAtLeast(1), BiomeToolThreadFactory)
+            Executors.newScheduledThreadPool((runtime.processors).coerceAtLeast(1), BiomeToolThreadFactory)
         
         private val coroutineDispatcher: ExecutorCoroutineDispatcher = scheduledThreadPool.asCoroutineDispatcher()
         

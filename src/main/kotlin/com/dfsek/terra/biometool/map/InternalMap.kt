@@ -4,13 +4,13 @@ import com.dfsek.terra.biometool.BiomeImageGenerator
 import com.dfsek.terra.biometool.util.ceilToInt
 import com.dfsek.terra.biometool.util.floorToInt
 import com.dfsek.terra.biometool.util.squash
+import java.lang.ref.SoftReference
 import javafx.application.Platform
 import javafx.scene.Group
 import kotlinx.coroutines.CoroutineScope
 import tornadofx.doubleProperty
 import tornadofx.minusAssign
 import tornadofx.onChange
-import java.lang.ref.SoftReference
 
 class InternalMap(
     val scope: CoroutineScope,

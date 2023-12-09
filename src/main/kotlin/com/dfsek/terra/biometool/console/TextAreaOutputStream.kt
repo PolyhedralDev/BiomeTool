@@ -1,7 +1,7 @@
 package com.dfsek.terra.biometool.console
 
-import javafx.scene.control.TextArea
 import java.io.OutputStream
+import javafx.scene.control.TextArea
 
 class TextAreaOutputStream(
     private val textArea: TextArea

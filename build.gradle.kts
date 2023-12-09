@@ -37,14 +37,14 @@ java {
 }
 
 val javafxModules = listOf(
-        "base",
-        "controls",
-        // "fxml",
-        "graphics",
-        "media",
-        // "swing",
-        // "web",
-                          )
+    "base",
+    "controls",
+    // "fxml",
+    "graphics",
+    "media",
+    // "swing",
+    // "web",
+)
 
 javafx {
     version = "17.0.9"
@@ -99,9 +99,9 @@ val bootstrapTerraAddon: Configuration by configurations.creating {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
-    
+
     val terraGitHash = "3aef97738"
-    
+
     bootstrapTerraAddon("com.dfsek.terra:api-addon-loader:0.1.0-BETA+$terraGitHash")
     bootstrapTerraAddon("com.dfsek.terra:manifest-addon-loader:1.0.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:biome-provider-extrusion:1.0.0-BETA+$terraGitHash")
@@ -140,31 +140,31 @@ dependencies {
     terraAddon("com.dfsek.terra:terrascript-function-check-noise-3d:1.0.1-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:terrascript-function-sampler:1.0.0-BETA+$terraGitHash")
 
-    
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    
+
     implementation("com.dfsek.terra:base:6.4.1-BETA+$terraGitHash")
-    
+
     implementation("ca.solo-studios:slf4k:0.5.3")
-    
+
     implementation("ch.qos.logback:logback-classic:1.4.14")
-    
+
     implementation("com.google.guava:guava:32.1.3-jre")
-    
+
     implementation("no.tornado:tornadofx:1.7.20") {
         exclude("org.jetbrains.kotlin")
     }
-    
+
     implementation("commons-io:commons-io:2.15.1")
-    
+
     for (javafxModule in javafxModules) {
         val mavenCoordinates = "org.openjfx:javafx-$javafxModule:${javafx.version}"
-        
+
         linuxImplementation("$mavenCoordinates:linux")
         windowsImplementation("$mavenCoordinates:win")
         osxImplementation("$mavenCoordinates:mac")
     }
-    
+
     // Jansi for terminal colouring on Windows
     windowsImplementation("org.fusesource.jansi:jansi:2.4.1")
 }
@@ -183,21 +183,21 @@ val javadoc by tasks.javadoc
 tasks.withType<ShadowJar>() {
     if (name == ShadowJavaPlugin.SHADOW_JAR_TASK_NAME)
         return@withType
-    
+
     group = "Jar"
     description = "A platform jar for $archiveClassifier with runtime dependencies"
     manifest.inheritFrom(jar.manifest)
-    
+
     from(sourceSets.main.orNull?.output)
     configurations.add(project.configurations.runtimeClasspath.orNull)
     exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
-    
+
     tasks.register<ConfigureShadowRelocation>(
-            ConfigureShadowRelocation.taskName(this)
-                                             ) {
+        ConfigureShadowRelocation.taskName(this)
+    ) {
         this@withType.dependsOn(this)
     }
-    
+
     doFirst {
         archiveVersion.set(project.version.toString())
     }
@@ -250,27 +250,27 @@ tasks.withType<Jar>() {
     entryCompression = ZipEntryCompression.STORED
     manifest {
         attributes(
-                "Main-Class" to mainClassName,
-                "Built-By" to System.getProperties()["user.name"],
-                "Built-Jdk" to System.getProperties()["java.version"],
-                "Name" to project.name,
-                "Add-Opens" to "javafx.graphics/javafx.scene",
-                  )
+            "Main-Class" to mainClassName,
+            "Built-By" to System.getProperties()["user.name"],
+            "Built-Jdk" to System.getProperties()["java.version"],
+            "Name" to project.name,
+            "Add-Opens" to "javafx.graphics/javafx.scene",
+        )
     }
 }
 
 val downloadDefaultPacks: Task by tasks.creating() {
     group = "application"
-    
+
     doFirst {
         val defaultPack = URL("https://github.com/PolyhedralDev/TerraOverworldConfig/releases/download/latest/default.zip")
         val fileName = defaultPack.file.substring(defaultPack.file.lastIndexOf("/"))
-        
+
         file("$runDir/packs/").mkdirs()
-        
+
         defaultPack.openStream().transferTo(file("$runDir/packs/$fileName").outputStream())
     }
-    
+
 }
 
 val prepareRunAddons by tasks.creating(Sync::class) {
@@ -281,20 +281,20 @@ val prepareRunAddons by tasks.creating(Sync::class) {
     val terraBoostrapJars = bootstrapTerraAddon.resolvedConfiguration.firstLevelModuleDependencies.flatMap { dependency ->
         dependency.moduleArtifacts.map { it.file }
     }
-    
+
     from(terraAddonJars)
-    
+
     from(terraBoostrapJars) {
         into("bootstrap")
     }
-    
+
     into("$runDir/addons")
 }
 
 tasks.getByName<JavaExec>("run") {
     dependsOn(prepareRunAddons, downloadDefaultPacks)
     runDir.mkdirs()
-    
+
     workingDir = runDir
     @Suppress("UselessCallOnNotNull") // Thanks Kotlin
     jvmArgs = jvmArgs.orEmpty() + listOf("--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
