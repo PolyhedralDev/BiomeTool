@@ -8,9 +8,10 @@ import com.dfsek.terra.api.world.biome.PlatformBiome
 import com.dfsek.terra.biometool.dummy.DummyItemHandle
 import com.dfsek.terra.biometool.dummy.DummyPlatformBiome
 import com.dfsek.terra.biometool.dummy.DummyWorldHandle
-import org.slf4j.kotlin.*
 import java.io.File
 import java.lang.reflect.AnnotatedType
+import org.slf4j.kotlin.getLogger
+import org.slf4j.kotlin.info
 
 object BiomeToolPlatform : AbstractPlatform() {
     private val logger by getLogger()

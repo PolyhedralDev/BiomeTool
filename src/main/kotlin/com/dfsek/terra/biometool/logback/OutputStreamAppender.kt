@@ -1,9 +1,9 @@
 package com.dfsek.terra.biometool.logback
 
 import ch.qos.logback.core.OutputStreamAppender
-import org.apache.commons.io.output.NullOutputStream
 import java.io.FilterOutputStream
 import java.io.OutputStream
+import org.apache.commons.io.output.NullOutputStream
 
 class OutputStreamAppender<E> : OutputStreamAppender<E>() {
     override fun start() {

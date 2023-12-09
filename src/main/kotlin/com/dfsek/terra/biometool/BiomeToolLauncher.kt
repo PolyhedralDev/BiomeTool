@@ -1,7 +1,8 @@
 package com.dfsek.terra.biometool
 
 import javafx.application.Application
-import org.slf4j.kotlin.*
+import org.slf4j.kotlin.getLogger
+import org.slf4j.kotlin.info
 
 object BiomeToolLauncher {
     private val logger by getLogger()
