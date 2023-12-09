@@ -6,9 +6,9 @@ import java.net.URL
 
 plugins {
     application
-    kotlin("jvm") version "1.6.10"
-    id("org.openjfx.javafxplugin") version "0.0.10"
-    id("com.github.johnrengelman.shadow") version "7.1.0"
+    kotlin("jvm") version "1.9.21"
+    id("org.openjfx.javafxplugin") version "0.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 var mainClassName: String by application.mainClass
@@ -47,7 +47,7 @@ val javafxModules = listOf(
                           )
 
 javafx {
-    version = "17"
+    version = "17.0.9"
     modules = javafxModules.map { "javafx.$it" }
 }
 
@@ -59,14 +59,29 @@ val implementation: Configuration by configurations.implementation
 val runtimeClasspath: Configuration by configurations.runtimeClasspath
 
 val linuxImplementation: Configuration by configurations.creating {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named<Usage>(Usage.JAVA_RUNTIME))
+        attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named<OperatingSystemFamily>("linux"))
+        attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named<MachineArchitecture>("x86-64"))
+    }
     extendsFrom(implementation)
 }
 
 val windowsImplementation: Configuration by configurations.creating {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named<Usage>(Usage.JAVA_RUNTIME))
+        attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named<OperatingSystemFamily>("windows"))
+        attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named<MachineArchitecture>("x86-64"))
+    }
     extendsFrom(implementation)
 }
 
 val osxImplementation: Configuration by configurations.creating {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named<Usage>(Usage.JAVA_RUNTIME))
+        attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named<OperatingSystemFamily>("mac"))
+        attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named<MachineArchitecture>("x86-64"))
+    }
     extendsFrom(implementation)
 }
 
@@ -83,60 +98,64 @@ val bootstrapTerraAddon: Configuration by configurations.creating {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     
-    val terraGitHash = "358e09d05"
+    val terraGitHash = "3aef97738"
     
     bootstrapTerraAddon("com.dfsek.terra:api-addon-loader:0.1.0-BETA+$terraGitHash")
     bootstrapTerraAddon("com.dfsek.terra:manifest-addon-loader:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:biome-provider-image:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:biome-provider-pipeline:1.0.1-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:biome-provider-extrusion:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:biome-provider-pipeline:v2-1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:biome-provider-image:1.0.1-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:biome-provider-image:v2-1.0.1-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:biome-provider-pipeline:1.0.2-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:biome-provider-pipeline:v2-1.0.1-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:biome-provider-single:1.0.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:biome-query-api:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:chunk-generator-noise-3d:1.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:chunk-generator-noise-3d:1.2.1-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:command-addons:1.0.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:command-packs:1.0.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:command-profiler:1.0.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:command-structures:1.0.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:config-biome:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:config-distributors:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-distributors:1.0.1-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:config-feature:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:config-flora:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:config-locators:1.1.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:config-noise-function:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:config-ore:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-flora:1.0.1-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-locators:1.1.1-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-noise-function:1.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-number-predicate:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-ore:1.1.1-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:config-palette:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:config-structure:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:config-structure:1.0.1-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:generation-stage-feature:1.1.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:generation-stage-structure:1.0.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:language-yaml:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:library-image:1.1.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:locator-slant-noise-3d:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:palette-block-shortcut:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:pipeline-image:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:structure-block-shortcut:1.0.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:structure-mutator:0.1.0-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:structure-sponge-loader:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:structure-terrascript-loader:1.1.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:terrascript-function-check-noise-3d:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:palette-block-shortcut:1.0.0-BETA+$terraGitHash")
-    terraAddon("com.dfsek.terra:structure-block-shortcut:1.0.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:structure-terrascript-loader:1.2.0-BETA+$terraGitHash")
+    terraAddon("com.dfsek.terra:terrascript-function-check-noise-3d:1.0.1-BETA+$terraGitHash")
     terraAddon("com.dfsek.terra:terrascript-function-sampler:1.0.0-BETA+$terraGitHash")
+
     
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     
-    implementation("com.dfsek.terra:base:6.2.1-BETA+$terraGitHash")
+    implementation("com.dfsek.terra:base:6.4.1-BETA+$terraGitHash")
     
-    implementation("ca.solo-studios:slf4k:0.4.6")
+    implementation("ca.solo-studios:slf4k:0.5.3")
     
-    implementation("ch.qos.logback:logback-classic:1.2.11")
+    implementation("ch.qos.logback:logback-classic:1.4.14")
     
-    implementation("com.google.guava:guava:31.1-jre")
+    implementation("com.google.guava:guava:32.1.3-jre")
     
     implementation("no.tornado:tornadofx:1.7.20") {
         exclude("org.jetbrains.kotlin")
     }
     
-    implementation("commons-io:commons-io:2.11.0")
+    implementation("commons-io:commons-io:2.15.1")
     
     for (javafxModule in javafxModules) {
         val mavenCoordinates = "org.openjfx:javafx-$javafxModule:${javafx.version}"
@@ -147,7 +166,7 @@ dependencies {
     }
     
     // Jansi for terminal colouring on Windows
-    windowsImplementation("org.fusesource.jansi:jansi:2.4.0")
+    windowsImplementation("org.fusesource.jansi:jansi:2.4.1")
 }
 
 tasks.test {
@@ -213,6 +232,18 @@ val shadowJarOSX by tasks.creating(ShadowJar::class) {
 val shadowJarAll by tasks.creating(ShadowJar::class) {
     archiveClassifier.set("all")
     configurations = listOf(linuxImplementation, windowsImplementation, osxImplementation)
+}
+
+tasks.named("shadowDistZip") {
+    dependsOn(shadowJarAll)
+}
+
+tasks.named("shadowDistTar") {
+    dependsOn(shadowJarAll)
+}
+
+tasks.named("startShadowScripts") {
+    dependsOn(shadowJarAll)
 }
 
 tasks.withType<Jar>() {
