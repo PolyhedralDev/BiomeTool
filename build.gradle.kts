@@ -188,7 +188,7 @@ dependencies {
     terraAddon("com.dfsek.terra:structure-terrascript-loader:1.2.0-BETA-$terraGitHash")
     terraAddon("com.dfsek.terra:terrascript-function-check-noise-3d:1.0.1-BETA-$terraGitHash")
     terraAddon("com.dfsek.terra:terrascript-function-sampler:1.0.0-BETA-$terraGitHash")
-    terraAddon("com.github.diytechy:dendryterra:1.0.0-BETA-H")
+    terraAddon("com.github.diytechy:dendryterra:1.0.0-BETA-J")
 
     // Default packs from Repsy diytechy/terra-packs. Group / artifactId / version
     // must match what Terra publishes — see Terra buildSrc DistributionConfig.kt
