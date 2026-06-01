@@ -10,9 +10,16 @@ set "JAVA_EXE="
 
 :: ── 1. Find the JAR ──────────────────────────────────────────────────────────
 set "JAR_FILE="
-for %%F in ("%SCRIPT_DIR%%JAR_PATTERN%") do set "JAR_FILE=%%F"
+set "JAR_DIR="
+for %%F in ("%SCRIPT_DIR%%JAR_PATTERN%") do (
+    set "JAR_FILE=%%F"
+    set "JAR_DIR=%%~dpF"
+)
 if not defined JAR_FILE (
-    for %%F in ("%SCRIPT_DIR%build\libs\%JAR_PATTERN%") do set "JAR_FILE=%%F"
+    for %%F in ("%SCRIPT_DIR%build\libs\%JAR_PATTERN%") do (
+        set "JAR_FILE=%%F"
+        set "JAR_DIR=%%~dpF"
+    )
 )
 
 if not defined JAR_FILE (
@@ -67,16 +74,16 @@ echo  Using Java !MAJOR! from: !JAVA_EXE!
 
 :: ── 4. Copy local DendryTerra build if available ─────────────────────────────
 if exist "%SCRIPT_DIR%..\DendryTerra\build\libs\DendryTerra-1.0.0-BETA-*.jar" (
-    if not exist "%SCRIPT_DIR%addons\" mkdir "%SCRIPT_DIR%addons" 2>nul
-    del /Q "%SCRIPT_DIR%addons\DendryTerra*.jar" 2>nul
-    copy /Y "%SCRIPT_DIR%..\DendryTerra\build\libs\DendryTerra-1.0.0-BETA-*.jar" "%SCRIPT_DIR%addons\" >nul
+    if not exist "%JAR_DIR%addons\" mkdir "%JAR_DIR%addons" 2>nul
+    del /Q "%JAR_DIR%addons\DendryTerra*.jar" 2>nul
+    copy /Y "%SCRIPT_DIR%..\DendryTerra\build\libs\DendryTerra-1.0.0-BETA-*.jar" "%JAR_DIR%addons\" >nul
     echo  Loaded local DendryTerra build.
 )
 
 :: ── 5. Launch ────────────────────────────────────────────────────────────────
 echo  Launching: %JAR_FILE%
 echo.
-cd /d "%SCRIPT_DIR%"
+cd /d "%JAR_DIR%"
 "%JAVA_EXE%" --add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED ^
     --add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED ^
     -jar "%JAR_FILE%" %*

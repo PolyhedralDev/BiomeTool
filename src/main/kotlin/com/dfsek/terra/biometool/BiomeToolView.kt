@@ -41,6 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
 import org.slf4j.kotlin.getLogger
 import org.slf4j.kotlin.info
 import tornadofx.View
@@ -117,12 +118,19 @@ class BiomeToolView : View("Biome Tool") {
     private var loadingOverlay by singleAssign<StackPane>()
 
     private var loadingLogView by singleAssign<LoadingLogView>()
+
+    private var loadingProgress by singleAssign<ProgressIndicator>()
+
+    private var loadingStatusLabel by singleAssign<Label>()
     
     init {
         logger.info { "Initializing Terra platform..." }
         platform = BiomeToolPlatform
-        platform.reload()
-        logger.info { "Terra platform initialized successfully" }
+        if (platform.reload()) {
+            logger.info { "Terra platform initialized successfully" }
+        } else {
+            logger.info { "Terra platform initialized with pack load failures — see error logs above" }
+        }
     }
     
     override val root = stackpane {
@@ -365,22 +373,29 @@ class BiomeToolView : View("Biome Tool") {
         loadingOverlay = stackpane {
             style = "-fx-background-color: rgba(0, 0, 0, 0.7);"
             isVisible = false
-            
+
             vbox(10.0) {
                 alignment = Pos.CENTER
                 padding = Insets(0.0, 0.0, 50.0, 0.0)
-                
-                add(ProgressIndicator().apply {
+
+                loadingProgress = ProgressIndicator().apply {
                     maxWidth = 50.0
                     maxHeight = 50.0
-                })
-                label("Reloading packs...") {
+                }
+                add(loadingProgress)
+                loadingStatusLabel = label("Reloading packs...") {
                     style = "-fx-text-fill: white; -fx-font-size: 14px;"
                 }
                 loadingLogView = LoadingLogView().apply {
                     padding = Insets(20.0, 0.0, 0.0, 0.0)
                 }
                 add(loadingLogView)
+            }
+
+            setOnMouseClicked {
+                if (!loadingProgress.isVisible) {
+                    isVisible = false
+                }
             }
         }
     }
@@ -559,28 +574,31 @@ class BiomeToolView : View("Biome Tool") {
             state.copy(x = mapView.x, y = mapView.y, zoomLevel = mapView.zoomLevel)
         }
         
-        tabStates.values.forEach { it.mapView.close() }
+        tabStates.values.forEach { it.mapView.close(); it.scope.cancel() }
         tabStates.clear()
         renderTabs.tabs.clear()
         
         loadingLogView.clear()
+        loadingProgress.isVisible = true
+        loadingStatusLabel.text = "Reloading packs..."
+        loadingStatusLabel.style = "-fx-text-fill: white; -fx-font-size: 14px;"
         loadingOverlay.isVisible = true
-        
+
         ReloadLogAppender.listener = { message ->
             loadingLogView.addLog(message)
         }
-        
+
         thread {
             platform.profiler.reset()
-            platform.reload()
-            
+            val success = platform.reload()
+
             runLater {
                 ReloadLogAppender.listener = null
-                
+
                 val configs = platform.configRegistry.keys().toList()
                 packSelection.items = configs.toObservable()
                 packSelection.selectionModel.selectFirst()
-                
+
                 for (state in savedStates) {
                     if (platform.configRegistry.contains(state.packKey)) {
                         val pack = platform.configRegistry[state.packKey].get()
@@ -595,12 +613,18 @@ class BiomeToolView : View("Biome Tool") {
                         )
                     }
                 }
-                
+
                 if (selectedTabIndex >= 0 && selectedTabIndex < renderTabs.tabs.size) {
                     renderTabs.selectionModel.select(selectedTabIndex)
                 }
-                
-                loadingOverlay.isVisible = false
+
+                if (success) {
+                    loadingOverlay.isVisible = false
+                } else {
+                    loadingProgress.isVisible = false
+                    loadingStatusLabel.text = "Pack load failed — see Console for details. Click anywhere to dismiss."
+                    loadingStatusLabel.style = "-fx-text-fill: #ff8080; -fx-font-size: 14px; -fx-font-weight: bold;"
+                }
             }
         }
     }
@@ -631,15 +655,23 @@ class BiomeToolView : View("Biome Tool") {
         val modeLabel = effectiveSurfaceMode.displayName
         return renderTabs.tab("$selectedPack:$seedLong:$modeLabel") {
             select()
-            
-            val mapView = mapview(BiomeToolView.scope, TerraBiomeImageGenerator(seedLong, pack, effectiveSurfaceMode)) {
+
+            // Each tab gets a scope limited to 1 concurrent tile render.
+            // Terra's BiomeProvider has a non-thread-safe internal chunk cache; concurrent
+            // getBiome calls from multiple threads corrupt it and produce wrong biomes for
+            // some tiles (visible as rectangular patches with an unexpected color palette).
+            // limitedParallelism(1) serialises rendering within this tab while still
+            // allowing the shared thread pool to serve other tabs concurrently.
+            val tabScope = CoroutineScope(SupervisorJob() + coroutineDispatcher.limitedParallelism(1))
+
+            val mapView = mapview(tabScope, TerraBiomeImageGenerator(seedLong, pack, effectiveSurfaceMode)) {
                 fitToParentSize()
                 if (initialX != 0.0 || initialY != 0.0 || initialZoom != 0.0) {
                     setPosition(initialX, initialY, initialZoom)
                 }
             }
 
-            tabStates[this] = TabState(selectedPack, seedLong, mapView, initialX, initialY, initialZoom, effectiveSurfaceMode)
+            tabStates[this] = TabState(selectedPack, seedLong, mapView, tabScope, initialX, initialY, initialZoom, effectiveSurfaceMode)
 
             mapView.setSubsampleFactor(loadSubsample())
 
@@ -662,7 +694,10 @@ class BiomeToolView : View("Biome Tool") {
             }
 
             setOnClosed {
-                tabStates.remove(this)?.mapView?.close()
+                tabStates.remove(this)?.let { state ->
+                    state.mapView.close()
+                    state.scope.cancel()
+                }
             }
         }
     }
@@ -718,6 +753,7 @@ class BiomeToolView : View("Biome Tool") {
         val packKey: RegistryKey,
         val seed: Long,
         val mapView: MapView,
+        val scope: CoroutineScope,
         val x: Double = 0.0,
         val y: Double = 0.0,
         val zoomLevel: Double = 0.0,

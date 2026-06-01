@@ -7,6 +7,8 @@ import com.dfsek.terra.api.world.biome.Biome
 import com.dfsek.terra.api.world.biome.generation.BiomeProvider
 import java.io.File
 import java.lang.reflect.Method
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Collections
@@ -14,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.LongAdder
 
@@ -47,12 +50,19 @@ object BiomeBenchmark {
         val threadCount      = (args.getOrNull(6)?.toIntOrNull() ?: 4).coerceAtLeast(1)
         val overflowEnabled  = (args.getOrNull(7)?.toIntOrNull() ?: 1) != 0
         val packName     = args.getOrNull(8)?.takeIf { it.isNotEmpty() } ?: "CHIMERA"
+        val packPath     = args.getOrNull(9)?.takeIf { it.isNotEmpty() }?.let { File(it) }
+        val dumpSurface  = (args.getOrNull(10)?.toIntOrNull() ?: 0) != 0
+        val dumpDirArg   = args.getOrNull(11)?.takeIf { it.isNotEmpty() }
 
         val imageSize     = TILE_PIXEL_SIZE shr lod
         val sampleStep    = subsample shl lod
         val totalTiles    = tilesX * tilesY
         val tileWorldSize = TILE_PIXEL_SIZE * subsample
         val stripWidth    = maxOf(1, 1000 / tileWorldSize)
+        // Grid is centered on world (0,0): tileWorldSize = 128 * subsample is always even, so the
+        // origin is exact with no rounding drift. The snake traversal still starts from the corner
+        // of this centered grid (intentional — it keeps the active processing zone ~1000 units wide
+        // for Terra's spatial caching; see buildSnakeOrder).
         val originX       = -(tilesX * tileWorldSize) / 2
         val originZ       = -(tilesY * tileWorldSize) / 2
 
@@ -63,7 +73,18 @@ object BiomeBenchmark {
         println("Total pixels: ${totalTiles.toLong() * imageSize * imageSize}")
         println("Seed: $seed")
         println("Threads: $threadCount  |  Snake strip: $stripWidth tile(s) wide (${stripWidth * tileWorldSize} world units)")
+        if (packPath != null) println("Pack path: ${packPath.absolutePath}  (single-pack mode)")
         println()
+
+        // Set single-pack override BEFORE the platform singleton is first accessed.
+        // BiomeToolPlatform.init{} calls load() (addons) using the real working dir;
+        // reload() then uses the temp folder built from packPath for pack discovery.
+        if (packPath != null) {
+            require(packPath.isDirectory) {
+                "Pack path '${packPath.absolutePath}' does not exist or is not a directory."
+            }
+            BiomeToolPlatform.singlePackOverride = packPath
+        }
 
         println("Initializing Terra platform...")
         val platform = BiomeToolPlatform
@@ -91,6 +112,23 @@ object BiomeBenchmark {
         val surfaceProvider = getSurfaceProvider(provider)
         val surfaceY        = packBlendMaxY(pack)
         println("Surface sample Y: $surfaceY  |  Subsurface sample Y: 0")
+
+        // Deterministic biome id -> index map (seeded from the pack registry, sorted). Shared
+        // read-mostly across worker threads; new ids encountered at runtime are appended.
+        val packId       = packKey.getID()
+        val biomeIndexMap = buildBiomeIndexMap(pack)
+
+        // Per-tile surface dump (opt-in). Files land in tiles_<packId>/ next to the CSV by default.
+        val dumpDir = if (dumpSurface) {
+            val baseDir = dumpDirArg?.let { File(it) }
+                ?: File(if (csvPrefix != null) File(csvPrefix).parentFile ?: File(".") else File("."), "tiles_$packId")
+            baseDir.mkdirs()
+            println("Per-tile surface dump ENABLED -> ${baseDir.absolutePath}")
+            baseDir
+        } else {
+            println("Per-tile surface dump DISABLED (--dump-surface=0)")
+            null
+        }
 
         val overflowChecker: TerrainOverflowChecker? = if (overflowEnabled) TerrainOverflowChecker(pack, provider, surfaceProvider, seed) else null
         if (overflowChecker == null) {
@@ -121,9 +159,10 @@ object BiomeBenchmark {
         println("Warming up (4 tiles)...")
         val warmupSurface    = HashMap<String, LongArray>()
         val warmupSubsurface = HashMap<String, LongArray>()
+        val warmupFirst    = HashMap<String, IntArray>()
         for ((tx, ty) in snakeOrder.take(4)) {
             renderTile(provider, surfaceProvider, tx, ty, originX, originZ, seed, subsample, imageSize, sampleStep, surfaceY,
-                warmupSurface, warmupSubsurface, checker = null)
+                warmupSurface, warmupSubsurface, warmupFirst, checker = null)
         }
 
         println("Running benchmark ($threadCount thread${if (threadCount == 1) "" else "s"})...")
@@ -140,12 +179,14 @@ object BiomeBenchmark {
             executor.submit(Callable {
                 val localSurface    = HashMap<String, LongArray>()
                 val localSubsurface = HashMap<String, LongArray>()
+                val localFirst    = HashMap<String, IntArray>()
                 for ((tileX, tileY) in segment) {
                     renderTile(provider, surfaceProvider, tileX, tileY, originX, originZ, seed, subsample,
-                        imageSize, sampleStep, surfaceY, localSurface, localSubsurface, overflowChecker)
+                        imageSize, sampleStep, surfaceY, localSurface, localSubsurface,
+                        localFirst, overflowChecker, biomeIndexMap, dumpDir)
                     tilesCompleted.incrementAndGet()
                 }
-                TileRenderResult(localSurface, localSubsurface)
+                TileRenderResult(localSurface, localSubsurface, localFirst)
             })
         }
         executor.shutdown()
@@ -168,10 +209,14 @@ object BiomeBenchmark {
         // once per (thread × unique biome), not once per pixel.
         val surfaceCounts    = HashMap<String, Long>()
         val subsurfaceCounts = HashMap<String, Long>()
+        // First-seen coordinate per biome. Futures are iterated in segment order, which is
+        // global snake-traversal order, so putIfAbsent keeps the earliest occurrence.
+        val firstCoord = HashMap<String, IntArray>()
         for (future in futures) {
             val result = future.get()
             for ((id, counter) in result.surfaceCounts)    surfaceCounts.merge(id, counter[0], Long::plus)
             for ((id, counter) in result.subsurfaceCounts) subsurfaceCounts.merge(id, counter[0], Long::plus)
+            for ((id, coord) in result.firstCoord) firstCoord.putIfAbsent(id, coord)
         }
 
         val tilesPerSecond  = totalTiles / elapsedSec
@@ -190,13 +235,19 @@ object BiomeBenchmark {
         println("World X range:    $originX .. $worldMaxX")
         println("World Z range:    $originZ .. $worldMaxZ")
 
-        val packId         = packKey.getID()
         val samplerStats   = overflowChecker?.getSamplerStats()
         val noNoiseProps   = overflowChecker?.getNoNoisePropsCounts()
         val evalErrors     = overflowChecker?.getEvalErrorCounts()
-        val csvFile  = writeBiomeCsv(packId, csvPrefix, surfaceCounts, subsurfaceCounts, samplerStats, noNoiseProps, evalErrors)
+        val csvFile  = writeBiomeCsv(packId, csvPrefix, surfaceCounts, subsurfaceCounts,
+            firstCoord, biomeIndexMap, samplerStats, noNoiseProps, evalErrors)
         println()
         println("Biome distribution saved to: ${csvFile.absolutePath}")
+
+        // Write the index legend so the raw tile dumps are self-contained.
+        if (dumpDir != null) {
+            val legend = writeIndexLegend(dumpDir, biomeIndexMap)
+            println("Biome index legend saved to:   ${legend.absolutePath}")
+        }
 
         val resultsFile = appendBenchmarkResult(
             tilesX, tilesY, seed, subsample, lod, threadCount, packId, csvPrefix,
@@ -273,6 +324,7 @@ object BiomeBenchmark {
     private data class TileRenderResult(
         val surfaceCounts: HashMap<String, LongArray>,
         val subsurfaceCounts: HashMap<String, LongArray>,
+        val firstCoord: HashMap<String, IntArray>,
     )
 
     private fun renderTile(
@@ -289,11 +341,17 @@ object BiomeBenchmark {
         surfaceY: Int,
         surfaceCounts: HashMap<String, LongArray>,
         subsurfaceCounts: HashMap<String, LongArray>,
+        firstCoord: HashMap<String, IntArray>,
         checker: TerrainOverflowChecker?,
+        biomeIndexMap: BiomeIndexMap? = null,
+        dumpDir: File? = null,
     ) {
         val tileWorldSize = TILE_PIXEL_SIZE * subsample
         val worldX = originX + tileX * tileWorldSize
         val worldZ = originZ + tileY * tileWorldSize
+
+        // Surface index buffer, allocated only when dumping (row-major: zi outer, xi inner).
+        val surfaceIndexes = if (dumpDir != null && biomeIndexMap != null) IntArray(imageSize * imageSize) else null
 
         for (zi in 0 until imageSize) {
             for (xi in 0 until imageSize) {
@@ -301,15 +359,26 @@ object BiomeBenchmark {
                 val pz = worldZ + zi * sampleStep
 
                 val surfaceBiome = surfaceProvider.getBiome(px, surfaceY, pz, seed)
-                surfaceCounts.getOrPut(surfaceBiome.id) { LongArray(1) }[0]++
+                val surfaceCounter = surfaceCounts[surfaceBiome.id]
+                if (surfaceCounter == null) surfaceCounts[surfaceBiome.id] = longArrayOf(1L) else surfaceCounter[0]++
+                if (!firstCoord.containsKey(surfaceBiome.id)) firstCoord[surfaceBiome.id] = intArrayOf(px, pz)
+                if (surfaceIndexes != null) {
+                    surfaceIndexes[zi * imageSize + xi] = biomeIndexMap!!.indexOf(surfaceBiome.id)
+                }
 
                 val subsurfaceBiome = provider.getBiome(px, 0, pz, seed)
-                subsurfaceCounts.getOrPut(subsurfaceBiome.id) { LongArray(1) }[0]++
+                val subsurfaceCounter = subsurfaceCounts[subsurfaceBiome.id]
+                if (subsurfaceCounter == null) subsurfaceCounts[subsurfaceBiome.id] = longArrayOf(1L) else subsurfaceCounter[0]++
+                if (!firstCoord.containsKey(subsurfaceBiome.id)) firstCoord[subsurfaceBiome.id] = intArrayOf(px, pz)
 
                 if (checker != null && xi % checker.stride == 0 && zi % checker.stride == 0) {
                     checker.checkPoint(px, pz)
                 }
             }
+        }
+
+        if (surfaceIndexes != null && dumpDir != null) {
+            writeTileDump(dumpDir, tileX, tileY, worldX, worldZ, imageSize, sampleStep, surfaceIndexes)
         }
     }
 
@@ -327,14 +396,89 @@ object BiomeBenchmark {
     }
 
     // -------------------------------------------------------------------------
+    // Biome index map (id -> stable integer index)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Deterministic, thread-safe biome id -> index map. Seeded in sorted registry order so the
+     * indexes are stable across runs of the same pack; any id seen at runtime but absent from the
+     * registry (e.g. a synthetic provider wrapper biome) is appended on first lookup, guaranteeing
+     * every dumped index can be rectified back to a biome id via [writeIndexLegend].
+     */
+    internal class BiomeIndexMap {
+        private val map  = ConcurrentHashMap<String, Int>()
+        private val next = AtomicInteger(0)
+
+        fun indexOf(id: String): Int = map.computeIfAbsent(id) { next.getAndIncrement() }
+        fun entriesSortedByIndex(): List<Pair<String, Int>> =
+            map.entries.sortedBy { it.value }.map { it.key to it.value }
+    }
+
+    private fun buildBiomeIndexMap(pack: ConfigPack): BiomeIndexMap {
+        val indexMap = BiomeIndexMap()
+        val ids = sortedSetOf(String.CASE_INSENSITIVE_ORDER)
+        pack.getCheckedRegistry(Biome::class.java).forEach { key, _ -> ids.add(key.id) }
+        ids.forEach { indexMap.indexOf(it) }
+        return indexMap
+    }
+
+    // -------------------------------------------------------------------------
     // File output
     // -------------------------------------------------------------------------
+
+    /**
+     * Writes one tile's surface biome-index grid as a self-describing little-endian binary file
+     * (see plan / BTSF layout): magic, version, tile coords, world origin of pixel (0,0), width,
+     * world stride per pixel, then width*width row-major (z-major) int32 indexes.
+     */
+    private fun writeTileDump(
+        dumpDir: File,
+        tileX: Int,
+        tileY: Int,
+        worldX: Int,
+        worldZ: Int,
+        width: Int,
+        stride: Int,
+        surfaceIndexes: IntArray,
+    ) {
+        // Header: 4-byte magic + 7 int32 fields (version, tileX, tileY, worldX, worldZ, width, stride).
+        val headerBytes = 4 + 7 * 4
+        val buffer = ByteBuffer.allocate(headerBytes + surfaceIndexes.size * 4)
+            .order(ByteOrder.LITTLE_ENDIAN)
+        buffer.put(byteArrayOf('B'.code.toByte(), 'T'.code.toByte(), 'S'.code.toByte(), 'F'.code.toByte()))
+        buffer.putInt(1)        // version
+        buffer.putInt(tileX)
+        buffer.putInt(tileY)
+        buffer.putInt(worldX)
+        buffer.putInt(worldZ)
+        buffer.putInt(width)
+        buffer.putInt(stride)
+        for (v in surfaceIndexes) buffer.putInt(v)
+
+        File(dumpDir, "tile_${tileX}_${tileY}.bin").outputStream().buffered().use { it.write(buffer.array()) }
+    }
+
+    /** Writes the index -> biome id legend so raw tile dumps are self-contained. */
+    private fun writeIndexLegend(dumpDir: File, biomeIndexMap: BiomeIndexMap): File {
+        val file = File(dumpDir, "index_legend.csv")
+        file.bufferedWriter().use { writer ->
+            writer.write("Index,Biome")
+            writer.newLine()
+            for ((id, idx) in biomeIndexMap.entriesSortedByIndex()) {
+                writer.write("$idx,$id")
+                writer.newLine()
+            }
+        }
+        return file
+    }
 
     private fun writeBiomeCsv(
         packId: String,
         csvPrefix: String?,
         surfaceCounts: HashMap<String, Long>,
         subsurfaceCounts: HashMap<String, Long>,
+        firstCoord: HashMap<String, IntArray>,
+        biomeIndexMap: BiomeIndexMap,
         samplerStats: Map<String, SamplerTiming>? = null,
         noNoiseProps: Map<String, Long>? = null,
         evalErrors: Map<String, Long>? = null,
@@ -353,7 +497,8 @@ object BiomeBenchmark {
 
         file.bufferedWriter().use { writer ->
             val header = buildString {
-                append("Biome,Surface Count,Surface %,Subsurface Count,Subsurface %")
+                append("Biome,Biome Index,Surface Count,Surface %,Subsurface Count,Subsurface %")
+                append(",First X,First Z")
                 if (overflowEnabled) append(",Overflow Samples,Avg Sampler µs,No Noise Props,Eval Errors")
             }
             writer.write(header)
@@ -361,8 +506,11 @@ object BiomeBenchmark {
             for (id in allBiomes) {
                 val sc  = surfaceCounts[id] ?: 0L
                 val ssc = subsurfaceCounts[id] ?: 0L
+                val first = firstCoord[id]
+                val idx = biomeIndexMap.indexOf(id)
                 val row = buildString {
-                    append("$id,$sc,${"%.4f".format(sc * 100.0 / surfaceTotal)},$ssc,${"%.4f".format(ssc * 100.0 / subsurfaceTotal)}")
+                    append("$id,$idx,$sc,${"%.4f".format(sc * 100.0 / surfaceTotal)},$ssc,${"%.4f".format(ssc * 100.0 / subsurfaceTotal)}")
+                    append(",${first?.get(0) ?: ""},${first?.get(1) ?: ""}")
                     if (overflowEnabled) {
                         val st    = samplerStats?.get(id)
                         val count = st?.sampleCount ?: 0L

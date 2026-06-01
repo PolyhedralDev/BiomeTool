@@ -1,0 +1,17 @@
+# Terrain overflow check: blend.terrain.y-range.max=301 (pack-configured)
+# Tiles: 200x200, seed: 7099699057166038826, pack: CHIMERA
+# Positions where terrain.sampler + terrain.sampler-2d density > 0 at y=301
+x=269920 z=295456 y=301 biome=MESA_MONUMENTS density=2.973652
+x=-189376 z=-298816 y=301 biome=MESA_MONUMENTS density=3.000000
+x=-189376 z=-298688 y=301 biome=MESA_MONUMENTS density=0.240230
+x=-189312 z=-298688 y=301 biome=MESA_MONUMENTS density=1.655942
+x=276992 z=162336 y=301 biome=ARID_ARBORETUM density=0.386090
+x=133024 z=110048 y=301 biome=SNOWY_SPIRES density=0.819084
+x=233536 z=-243904 y=301 biome=MESA_MONUMENTS density=3.000000
+x=82368 z=289152 y=301 biome=MESA_MONUMENTS density=3.000000
+x=294752 z=-299424 y=301 biome=MESA_MONUMENTS density=3.000000
+x=294816 z=-299328 y=301 biome=MESA_MONUMENTS density=3.000000
+x=294880 z=-299264 y=301 biome=MESA_MONUMENTS density=0.502498
+x=97632 z=-177184 y=301 biome=ORANGE_DESERT density=20.069339
+x=97632 z=-177152 y=301 biome=ORANGE_DESERT density=13.055414
+x=204672 z=405600 y=301 biome=MESA_MONUMENTS density=2.693950
