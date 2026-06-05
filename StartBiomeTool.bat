@@ -28,8 +28,8 @@ if not defined JAR_FILE (
     echo  ERROR: No BiomeTool JAR found.
     echo.
     echo  Looked in:
-    echo    %SCRIPT_DIR%
-    echo    %SCRIPT_DIR%build\libs\
+    echo    !SCRIPT_DIR!
+    echo    !SCRIPT_DIR!build\libs\
     echo.
     echo  Build the project first:  gradlew.bat build
     echo.

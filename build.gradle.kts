@@ -150,7 +150,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 
-    val terraGitHash = "fd677b1"
+    val terraGitHash = "87a8050"
 
     bootstrapTerraAddon("com.dfsek.terra:api-addon-loader:0.1.0-BETA-$terraGitHash")
     bootstrapTerraAddon("com.dfsek.terra:manifest-addon-loader:1.0.0-BETA-$terraGitHash")
@@ -193,7 +193,7 @@ dependencies {
     // Default packs from Repsy diytechy/terra-packs. Group / artifactId / version
     // must match what Terra publishes — see Terra buildSrc DistributionConfig.kt
     // (groupPath = com/diytechy/terra/packs, artifactId uppercase pack name).
-    defaultPacks("com.diytechy.terra.packs:CHIMERA:0.0.5@zip")
+    defaultPacks("com.diytechy.terra.packs:CHIMERA:0.0.8@zip")
     defaultPacks("com.diytechy.terra.packs:TARTARUS:1.0.0@zip")
     defaultPacks("com.diytechy.terra.packs:REIMAGEND:3.0.0@zip")
 

@@ -1,0 +1,21 @@
+# Terrain overflow check: blend.terrain.y-range.max=301 (pack-configured)
+# Tiles: 600x600, seed: 7099699057166038826, pack: CHIMERA
+# Positions where terrain.sampler + terrain.sampler-2d density > 0 at y=301
+x=8668 z=-146704 y=301 biome=MESA_MONUMENTS density=0.048847
+x=8664 z=-146700 y=301 biome=MESA_MONUMENTS density=0.685524
+x=8668 z=-146700 y=301 biome=MESA_MONUMENTS density=2.125163
+x=8672 z=-146700 y=301 biome=MESA_MONUMENTS density=1.579956
+x=8664 z=-146696 y=301 biome=MESA_MONUMENTS density=1.122029
+x=8668 z=-146696 y=301 biome=MESA_MONUMENTS density=3.000000
+x=8672 z=-146696 y=301 biome=MESA_MONUMENTS density=2.192788
+x=8676 z=-146696 y=301 biome=MESA_MONUMENTS density=0.161133
+x=8664 z=-146692 y=301 biome=MESA_MONUMENTS density=0.093340
+x=8668 z=-146692 y=301 biome=MESA_MONUMENTS density=1.208532
+x=8672 z=-146692 y=301 biome=MESA_MONUMENTS density=0.843646
+x=142680 z=-76076 y=301 biome=DIKSAM_PLATEAU density=2.913465
+x=142684 z=-76076 y=301 biome=DIKSAM_PLATEAU density=1.568220
+x=142680 z=-76072 y=301 biome=DIKSAM_PLATEAU density=3.871629
+x=142684 z=-76072 y=301 biome=DIKSAM_PLATEAU density=0.700486
+x=142680 z=-76068 y=301 biome=DIKSAM_PLATEAU density=0.834930
+x=-65600 z=-40700 y=301 biome=FROZEN_SPIRES density=0.807493
+x=-65596 z=-40700 y=301 biome=FROZEN_SPIRES density=0.267824
